@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # Configuration
-TEST_MODE="${TEST_MODE:-true}"
+TEST_MODE="false"
 URL="https://github.com/worklouder/input-releases/releases/download/v0.8.0-rc.2/input-Setup-0.8.0-rc.2.exe"
 FILENAME="input-Setup-0.8.0-rc.2.exe"
 DOWNLOAD_DIR="./input_download"
