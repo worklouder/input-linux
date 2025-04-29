@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # Configuration
-TEST_MODE="false"
+TEST_MODE="${TEST_MODE:-true}"
 URL="https://github.com/worklouder/input-releases/releases/download/v0.8.0-rc.2/input-Setup-0.8.0-rc.2.exe"
 FILENAME="input-Setup-0.8.0-rc.2.exe"
 DOWNLOAD_DIR="./input_download"
@@ -10,6 +10,7 @@ EXTRACT_DIR="./input_extracted"
 REBUILD_DIR="./input_rebuild"
 APP_64_EXTRACT_DIR="$REBUILD_DIR/app-64"
 FINAL_APP_DIR="./input-app"
+ELECTRON_VERSION="29.2.0"
 
 # Ensure required tools are available
 for cmd in curl 7z asar npm; do
@@ -76,19 +77,28 @@ if ! asar extract "$ASAR_FILE" "$UNPACKED_DIR"; then
 fi
 
 # Install Electron dependencies
-echo "Installing Electron and dependencies..."
+echo "Installing Electron and rebuild tools..."
 (
     cd "$RESOURCES_DIR" || handle_error "Failed to cd into $RESOURCES_DIR"
-    npm install electron@29.2.0 --save-dev || handle_error "Failed to install Electron"
-    npm install electron-rebuild --save-dev || handle_error "Failed to install electron-rebuild"
+    npm install --save-dev "electron@$ELECTRON_VERSION" || handle_error "Failed to install Electron"
+    npm install --save-dev electron-rebuild || handle_error "Failed to install electron-rebuild"
 )
 
-# Rebuild native modules
-echo "Running electron-rebuild..."
+# Rebuild native modules for Electron, especially node-hid
+echo "Rebuilding node-hid for Electron..."
 (
     cd "$UNPACKED_DIR" || handle_error "Failed to cd into $UNPACKED_DIR"
-    npx electron-rebuild || handle_error "electron-rebuild failed"
+    
+    # Uninstall old version if present
+    npm uninstall node-hid || true
+
+    # Force build from source
+    npm install node-hid --build-from-source || handle_error "Failed to install node-hid from source"
+
+    # Rebuild ONLY node-hid for Electron ABI compatibility
+    npx electron-rebuild -f -w node-hid -v "$ELECTRON_VERSION" || handle_error "electron-rebuild for node-hid failed"
 )
+
 
 # Move the final app to project root
 if [[ -d "$FINAL_APP_DIR" ]]; then
