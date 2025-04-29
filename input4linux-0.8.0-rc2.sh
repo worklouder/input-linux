@@ -1,102 +1,106 @@
 #!/bin/bash
+set -euo pipefail
 
-# Config
-TEST_MODE=true  # Set to false for production
+# Configuration
+TEST_MODE="${TEST_MODE:-true}"
 URL="https://github.com/worklouder/input-releases/releases/download/v0.8.0-rc.2/input-Setup-0.8.0-rc.2.exe"
 FILENAME="input-Setup-0.8.0-rc.2.exe"
 DOWNLOAD_DIR="./input_download"
 EXTRACT_DIR="./input_extracted"
 REBUILD_DIR="./input_rebuild"
 APP_64_EXTRACT_DIR="$REBUILD_DIR/app-64"
+FINAL_APP_DIR="./input-app"
 
-# Helper Function
-handle_error() {
-  if [ $? -ne 0 ]; then
-    echo "❌ $1"
-    if [ "$TEST_MODE" = true ]; then
-      echo "⚠️ TEST_MODE enabled, continuing..."
-    else
-      exit 1
+# Ensure required tools are available
+for cmd in curl 7z asar npm; do
+    if ! command -v "$cmd" &>/dev/null; then
+        echo "Missing required command: $cmd"
+        [[ "$TEST_MODE" == true ]] && echo "Test mode enabled, continuing..." || exit 1
     fi
-  fi
+done
+
+# Error handling
+handle_error() {
+    local message="$1"
+    if [[ "$TEST_MODE" == true ]]; then
+        echo "$message (ignored due to TEST_MODE)"
+    else
+        echo "$message"
+        exit 1
+    fi
 }
 
-# Prep directories
+# Prepare directories
 mkdir -p "$DOWNLOAD_DIR" "$EXTRACT_DIR" "$REBUILD_DIR" "$APP_64_EXTRACT_DIR"
 
 # Download EXE
-echo "📥 Downloading $FILENAME..."
-curl -L "$URL" -o "$DOWNLOAD_DIR/$FILENAME"
-handle_error "Download failed!"
-
-# Extract EXE
-echo "📦 Extracting $FILENAME..."
-7z x "$DOWNLOAD_DIR/$FILENAME" -o"$EXTRACT_DIR"
-handle_error "Extraction of EXE failed!"
-
-# Locate and move app-64
-APP_64_FILE=$(find "$EXTRACT_DIR" -type f -name "app-64.7z" | head -n 1)
-if [ -z "$APP_64_FILE" ]; then
-  echo "❌ app-64.7z not found!"
-  [ "$TEST_MODE" = true ] && echo "⚠️ TEST_MODE enabled, continuing..." || exit 1
-else
-  cp "$APP_64_FILE" "$REBUILD_DIR/"
-  echo "✅ Copied app-64.7z to $REBUILD_DIR"
+echo "Downloading $FILENAME..."
+if ! curl -L "$URL" -o "$DOWNLOAD_DIR/$FILENAME"; then
+    handle_error "Download failed"
 fi
 
+# Extract EXE
+echo "Extracting $FILENAME..."
+if ! 7z x "$DOWNLOAD_DIR/$FILENAME" -o"$EXTRACT_DIR"; then
+    handle_error "Extraction of EXE failed"
+fi
+
+# Locate and move app-64.7z
+APP_64_FILE=$(find "$EXTRACT_DIR" -type f -name "app-64.7z" | head -n 1 || true)
+if [[ -z "$APP_64_FILE" ]]; then
+    handle_error "app-64.7z not found"
+else
+    cp "$APP_64_FILE" "$REBUILD_DIR/"
+    echo "Copied app-64.7z to $REBUILD_DIR"
+fi
 
 # Extract app-64.7z
-echo "📦 Extracting app-64.7z..."
-7z x "$REBUILD_DIR/app-64.7z" -o"$APP_64_EXTRACT_DIR"
-handle_error "Extraction of app-64.7z failed!"
-
-echo "✅ Extracted app-64.7z to $APP_64_EXTRACT_DIR"
+echo "Extracting app-64.7z..."
+if ! 7z x "$REBUILD_DIR/app-64.7z" -o"$APP_64_EXTRACT_DIR"; then
+    handle_error "Extraction of app-64.7z failed"
+fi
 
 # Unpack app.asar
 RESOURCES_DIR="$APP_64_EXTRACT_DIR/resources"
 ASAR_FILE="$RESOURCES_DIR/app.asar"
 UNPACKED_DIR="$RESOURCES_DIR/app_unpacked"
 
-if ! command -v asar &> /dev/null; then
-  echo "❌ 'asar' CLI not found. Please run: npm install -g asar"
-  [ "$TEST_MODE" = true ] && echo "⚠️ TEST_MODE enabled, continuing..." || exit 1
+if [[ ! -f "$ASAR_FILE" ]]; then
+    handle_error "app.asar not found at $ASAR_FILE"
 fi
 
-if [ ! -f "$ASAR_FILE" ]; then
-  echo "❌ app.asar not found at $ASAR_FILE"
-  [ "$TEST_MODE" = true ] && echo "⚠️ TEST_MODE enabled, continuing..." || exit 1
-fi
-
-echo "📦 Unpacking app.asar to $UNPACKED_DIR..."
+echo "Unpacking app.asar to $UNPACKED_DIR..."
 mkdir -p "$UNPACKED_DIR"
-asar extract "$ASAR_FILE" "$UNPACKED_DIR"
-handle_error "Failed to unpack app.asar"
+if ! asar extract "$ASAR_FILE" "$UNPACKED_DIR"; then
+    handle_error "Failed to unpack app.asar"
+fi
 
-echo "✅ app.asar successfully unpacked to $UNPACKED_DIR"
+# Install Electron dependencies
+echo "Installing Electron and dependencies..."
+(
+    cd "$RESOURCES_DIR" || handle_error "Failed to cd into $RESOURCES_DIR"
+    npm install electron@29.2.0 --save-dev || handle_error "Failed to install Electron"
+    npm install electron-rebuild --save-dev || handle_error "Failed to install electron-rebuild"
+)
 
+# Rebuild native modules
+echo "Running electron-rebuild..."
+(
+    cd "$UNPACKED_DIR" || handle_error "Failed to cd into $UNPACKED_DIR"
+    npx electron-rebuild || handle_error "electron-rebuild failed"
+)
 
-# INSTALL DEPENDENCIES
-cd "$RESOURCES_DIR" || {
-  echo "❌ Failed to cd into $RESOURCES_DIR"
-  [ "$TEST_MODE" = true ] && echo "⚠️ TEST_MODE enabled, continuing..." || exit 1
-}
+# Move the final app to project root
+if [[ -d "$FINAL_APP_DIR" ]]; then
+    echo "Removing existing $FINAL_APP_DIR"
+    rm -rf "$FINAL_APP_DIR"
+fi
+mv "$UNPACKED_DIR" "$FINAL_APP_DIR"
+echo "Moved unpacked app to $FINAL_APP_DIR"
 
-echo "📦 Installing Electron 29.2.0..."
-npm install electron@29.2.0 --save-dev
-handle_error "Failed to install Electron"
+# Clean up
+echo "Cleaning up temporary directories..."
+rm -rf "$DOWNLOAD_DIR" "$EXTRACT_DIR" "$REBUILD_DIR"
 
-echo "📦 Installing electron-rebuild..."
-npm install electron-rebuild --save-dev
-handle_error "Failed to install electron-rebuild"
-
-# REBUILD NATIVE MODULES
-cd "$UNPACKED_DIR" || {
-  echo "❌ Failed to cd into $UNPACKED_DIR"
-  [ "$TEST_MODE" = true ] && echo "⚠️ TEST_MODE enabled, continuing..." || exit 1
-}
-
-echo "🔧 Running electron-rebuild..."
-npx electron-rebuild
-handle_error "electron-rebuild failed"
-
-echo "✅ electron-rebuild completed successfully"
+echo "All steps completed. You can now run the app with:"
+echo "npx electron ./input-app"
