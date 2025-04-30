@@ -94,10 +94,13 @@ fi
 
 mv "$UNPACKED_DIR" "$FINAL_APP_DIR"
 
-# Move start.sh if it exists
+# Move start.sh and make it executable
 if [[ -f "./start.sh" ]]; then
     echo "Moving start.sh to $FINAL_APP_DIR"
     mv ./start.sh "$FINAL_APP_DIR/start.sh"
+    chmod +x "$FINAL_APP_DIR/start.sh"
+else
+    echo "start.sh not found, skipping move"
 fi
 
 # Cleanup
