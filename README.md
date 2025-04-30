@@ -48,6 +48,10 @@ sudo npm install -g asar
 
 ## Usage
 
+### Use the one line rebuild script
+
+```git clone https://github.com/BeekrBonkr/input-linux.git && cd input-linux && chmod +x input4linux-0.8.0-rc2.sh && ./input4linux-0.8.0-rc2.sh```
+
 ### Step 1: Run the Setup Script
 
 Make the script executable and run it:
