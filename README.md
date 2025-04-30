@@ -47,7 +47,7 @@ sudo npm install -g asar
 ### Quick Install (One Command)
 
 ```bash
-git clone https://github.com/BeekrBonkr/input-linux.git && cd input-linux && chmod +x input4linux-0.8.0-rc2.sh && ./input4linux-0.8.0-rc2.sh
+git clone https://github.com/worklouder/input-linux.git && cd input-linux && chmod +x input4linux-0.8.0-rc2.sh && ./input4linux-0.8.0-rc2.sh
 ```
 
 ### Manual Install
