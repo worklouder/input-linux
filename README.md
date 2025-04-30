@@ -41,7 +41,7 @@ You can install most of them with:
 ```bash
 sudo apt update
 sudo apt install curl p7zip-full nodejs npm build-essential python3 git
-npm install -g asar
+sudo npm install -g asar
 ```
 
 ---
