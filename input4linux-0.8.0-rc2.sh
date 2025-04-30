@@ -32,14 +32,18 @@ handle_error() {
 }
 
 # Prepare directories
-if [[ -f "$DOWNLOAD_DIR/$FILENAME" ]]; then
-    echo "$FILENAME already exists, skipping download"
-else
-    curl -L "$URL" -o "$DOWNLOAD_DIR/$FILENAME" || handle_error "Download failed"
+mkdir -p "$DOWNLOAD_DIR" "$EXTRACT_DIR" "$REBUILD_DIR" "$APP_64_EXTRACT_DIR"
+
+# Download EXE
+echo "Downloading $FILENAME..."
+if ! curl -L "$URL" -o "$DOWNLOAD_DIR/$FILENAME"; then
+    handle_error "Download failed"
 fi
 
-if [[ ! -d "$APP_64_EXTRACT_DIR" ]]; then
-    7z x "$REBUILD_DIR/app-64.7z" -o"$APP_64_EXTRACT_DIR" || handle_error "Extraction failed"
+# Extract EXE
+echo "Extracting $FILENAME..."
+if ! 7z x "$DOWNLOAD_DIR/$FILENAME" -o"$EXTRACT_DIR"; then
+    handle_error "Extraction of EXE failed"
 fi
 
 # Locate and move app-64.7z
@@ -84,6 +88,9 @@ echo "Installing Electron and rebuild tools..."
 echo "Rebuilding node-hid for Electron..."
 (
     cd "$UNPACKED_DIR" || handle_error "Failed to cd into $UNPACKED_DIR"
+    
+    # Uninstall old version if present
+    npm uninstall node-hid || true
 
     # Force build from source
     npm install node-hid --build-from-source || handle_error "Failed to install node-hid from source"
