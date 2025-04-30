@@ -12,7 +12,7 @@ APP_64_EXTRACT_DIR="$REBUILD_DIR/app-64"
 FINAL_APP_DIR="./input-app"
 ELECTRON_VERSION="29.2.0"
 
-# Ensure required tools are available
+# Required tools check
 for cmd in curl 7z asar npm; do
     if ! command -v "$cmd" &>/dev/null; then
         echo "Missing required command: $cmd"
@@ -20,7 +20,7 @@ for cmd in curl 7z asar npm; do
     fi
 done
 
-# Error handling
+# Error handler
 handle_error() {
     local message="$1"
     if [[ "$TEST_MODE" == true ]]; then
@@ -34,83 +34,75 @@ handle_error() {
 # Prepare directories
 mkdir -p "$DOWNLOAD_DIR" "$EXTRACT_DIR" "$REBUILD_DIR" "$APP_64_EXTRACT_DIR"
 
-# Download EXE
+# Download installer
 echo "Downloading $FILENAME..."
 if ! curl -L "$URL" -o "$DOWNLOAD_DIR/$FILENAME"; then
     handle_error "Download failed"
 fi
 
-# Extract EXE
+# Extract installer
 echo "Extracting $FILENAME..."
 if ! 7z x "$DOWNLOAD_DIR/$FILENAME" -o"$EXTRACT_DIR"; then
-    handle_error "Extraction of EXE failed"
+    handle_error "Failed to extract EXE"
 fi
 
-# Locate and move app-64.7z
+# Find app-64.7z and move it
 APP_64_FILE=$(find "$EXTRACT_DIR" -type f -name "app-64.7z" | head -n 1 || true)
 if [[ -z "$APP_64_FILE" ]]; then
     handle_error "app-64.7z not found"
 else
     cp "$APP_64_FILE" "$REBUILD_DIR/"
-    echo "Copied app-64.7z to $REBUILD_DIR"
 fi
 
 # Extract app-64.7z
 echo "Extracting app-64.7z..."
 if ! 7z x "$REBUILD_DIR/app-64.7z" -o"$APP_64_EXTRACT_DIR"; then
-    handle_error "Extraction of app-64.7z failed"
+    handle_error "Failed to extract app-64.7z"
 fi
 
-# Unpack app.asar
+# Extract app.asar
 RESOURCES_DIR="$APP_64_EXTRACT_DIR/resources"
 ASAR_FILE="$RESOURCES_DIR/app.asar"
 UNPACKED_DIR="$RESOURCES_DIR/app_unpacked"
 
 if [[ ! -f "$ASAR_FILE" ]]; then
-    handle_error "app.asar not found at $ASAR_FILE"
+    handle_error "app.asar not found"
 fi
 
-echo "Unpacking app.asar to $UNPACKED_DIR..."
+echo "Unpacking app.asar..."
 mkdir -p "$UNPACKED_DIR"
 if ! asar extract "$ASAR_FILE" "$UNPACKED_DIR"; then
     handle_error "Failed to unpack app.asar"
 fi
 
-# Install Electron dependencies
-echo "Installing Electron and rebuild tools..."
+# Prepare Electron environment in unpacked app
+echo "Setting up Node environment..."
 (
-    cd "$RESOURCES_DIR" || handle_error "Failed to cd into $RESOURCES_DIR"
-    npm install --save-dev "electron@$ELECTRON_VERSION" || handle_error "Failed to install Electron"
-    npm install --save-dev electron-rebuild || handle_error "Failed to install electron-rebuild"
-)
-
-# Rebuild native modules for Electron, especially node-hid
-echo "Rebuilding node-hid for Electron..."
-(
-    cd "$UNPACKED_DIR" || handle_error "Failed to cd into $UNPACKED_DIR"
-    
-    # Uninstall old version if present
+    cd "$UNPACKED_DIR" || handle_error "Cannot cd into unpacked directory"
+    npm init -y || handle_error "npm init failed"
+    npm install --save-dev "electron@$ELECTRON_VERSION" electron-rebuild || handle_error "Failed to install Electron or electron-rebuild"
     npm uninstall node-hid || true
-
-    # Force build from source
-    npm install node-hid --build-from-source || handle_error "Failed to install node-hid from source"
-
-    # Rebuild ONLY node-hid for Electron ABI compatibility
-    npx electron-rebuild -f -w node-hid -v "$ELECTRON_VERSION" || handle_error "electron-rebuild for node-hid failed"
+    npm install node-hid --build-from-source || handle_error "node-hid build failed"
+    npx electron-rebuild -f -w node-hid -v "$ELECTRON_VERSION" || handle_error "electron-rebuild failed"
 )
 
-
-# Move the final app to project root
+# Move unpacked app to final destination
 if [[ -d "$FINAL_APP_DIR" ]]; then
-    echo "Removing existing $FINAL_APP_DIR"
+    echo "Removing old $FINAL_APP_DIR"
     rm -rf "$FINAL_APP_DIR"
 fi
-mv "$UNPACKED_DIR" "$FINAL_APP_DIR"
-echo "Moved unpacked app to $FINAL_APP_DIR"
 
-# Clean up
-echo "Cleaning up temporary directories..."
+mv "$UNPACKED_DIR" "$FINAL_APP_DIR"
+
+# Move start.sh if it exists
+if [[ -f "./start.sh" ]]; then
+    echo "Moving start.sh to $FINAL_APP_DIR"
+    mv ./start.sh "$FINAL_APP_DIR/start.sh"
+fi
+
+# Cleanup
+echo "Cleaning up temporary files..."
 rm -rf "$DOWNLOAD_DIR" "$EXTRACT_DIR" "$REBUILD_DIR"
 
-echo "All steps completed. You can now run the app with:"
-echo "npx electron ./input-app"
+echo "Done. Launch the app using:"
+echo "./input-app/start.sh"
