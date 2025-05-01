@@ -62,7 +62,8 @@
     ],
     "linux": {
       "target": "AppImage",
-      "category": "Utility"
+      "category": "Utility",
+      "icon": "dist/assets/appicon.png"
     },
     "npmRebuild": false,
     "buildDependenciesFromSource": false
