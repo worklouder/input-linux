@@ -103,6 +103,19 @@ else
     echo "start.sh not found, skipping move"
 fi
 
+# Move appicon.png into app's assets directory
+ICON_SOURCE="./appicon.png"
+ICON_DEST_DIR="$FINAL_APP_DIR/assets"
+ICON_DEST="$ICON_DEST_DIR/appicon.png"
+
+if [[ -f "$ICON_SOURCE" ]]; then
+    echo "Found appicon.png, moving to $ICON_DEST"
+    mkdir -p "$ICON_DEST_DIR"
+    mv "$ICON_SOURCE" "$ICON_DEST"
+else
+    echo "appicon.png not found in script root, skipping icon move"
+fi
+
 # Cleanup
 echo "Cleaning up temporary files..."
 rm -rf "$DOWNLOAD_DIR" "$EXTRACT_DIR" "$REBUILD_DIR"
