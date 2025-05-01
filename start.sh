@@ -8,11 +8,11 @@ SANDBOX="$SCRIPT_DIR/node_modules/electron/dist/chrome-sandbox"
 
 # Udev rules check and update
 UDEV_RULES_FILE="/etc/udev/rules.d/99-input.rules"
-REQUIRED_RULES='# Work Louder Input Device\nSUBSYSTEM=="usb", ATTR{idVendor}=="1209", ATTR{idProduct}=="3456", MODE="0666", GROUP="plugdev"'
+REQUIRED_RULES='# Work Louder Input Device\nSUBSYSTEM=="usb", ATTR{idVendor}=="1209", ATTR{idProduct}=="8294", MODE="0666", GROUP="plugdev"\nSUBSYSTEM=="usb", ATTR{idVendor}=="1209", ATTR{idProduct}=="8295", MODE="0666", GROUP="plugdev"'
 
 check_udev_rules() {
     if [[ -f "$UDEV_RULES_FILE" ]]; then
-        if grep -q "1209.*3456" "$UDEV_RULES_FILE"; then
+        if grep -q "1209.*8294" "$UDEV_RULES_FILE" && grep -q "1209.*8295" "$UDEV_RULES_FILE"; then
             return 0
         fi
     fi
