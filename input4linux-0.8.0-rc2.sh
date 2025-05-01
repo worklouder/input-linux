@@ -116,6 +116,18 @@ else
     echo "appicon.png not found in script root, skipping icon move"
 fi
 
+# Copy package.json to the final app directory (overwriting any existing one)
+PACKAGE_SOURCE="./package.json"
+PACKAGE_DEST="$FINAL_APP_DIR/package.json"
+
+if [[ -f "$PACKAGE_SOURCE" ]]; then
+    echo "Copying package.json to $FINAL_APP_DIR"
+    cp -f "$PACKAGE_SOURCE" "$PACKAGE_DEST"
+else
+    echo "package.json not found in script root, skipping copy"
+fi
+
+
 # Cleanup
 echo "Cleaning up temporary files..."
 rm -rf "$DOWNLOAD_DIR" "$EXTRACT_DIR" "$REBUILD_DIR"
