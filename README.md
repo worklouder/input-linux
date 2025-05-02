@@ -44,11 +44,25 @@ sudo npm install -g asar
 
 ## Usage
 
+### Quick Udev Rule Setup
+
+Before launching the app, install the necessary udev rules to allow access to your Work Louder keyboard:
+
+```bash
+curl -sSL https://raw.githubusercontent.com/BeekrBonkr/input-linux/refs/heads/main/install-udev-worklouder.sh | sudo bash
+```
+
+Afterward, **replug your keyboard** and launch the app.
+
+---
+
 ### Quick Install (One Command)
 
 ```bash
 git clone https://github.com/worklouder/input-linux.git && cd input-linux && chmod +x input4linux-0.8.0-rc2.sh && ./input4linux-0.8.0-rc2.sh
 ```
+
+---
 
 ### Manual Install
 
