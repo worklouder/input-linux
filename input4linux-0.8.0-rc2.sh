@@ -103,6 +103,31 @@ else
     echo "start.sh not found, skipping move"
 fi
 
+# Move appicon.png into dist/assets directory of the final app
+ICON_SOURCE="./appicon.png"
+ICON_DEST_DIR="$FINAL_APP_DIR/dist/assets"
+ICON_DEST="$ICON_DEST_DIR/appicon.png"
+
+if [[ -f "$ICON_SOURCE" ]]; then
+    echo "Found appicon.png, moving to $ICON_DEST"
+    mkdir -p "$ICON_DEST_DIR"
+    mv "$ICON_SOURCE" "$ICON_DEST"
+else
+    echo "appicon.png not found in script root, skipping icon move"
+fi
+
+# Copy package.json to the final app directory (overwriting any existing one)
+PACKAGE_SOURCE="./package.json"
+PACKAGE_DEST="$FINAL_APP_DIR/package.json"
+
+if [[ -f "$PACKAGE_SOURCE" ]]; then
+    echo "Copying package.json to $FINAL_APP_DIR"
+    cp -f "$PACKAGE_SOURCE" "$PACKAGE_DEST"
+else
+    echo "package.json not found in script root, skipping copy"
+fi
+
+
 # Cleanup
 echo "Cleaning up temporary files..."
 rm -rf "$DOWNLOAD_DIR" "$EXTRACT_DIR" "$REBUILD_DIR"
