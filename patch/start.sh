@@ -1,14 +1,17 @@
 #!/bin/bash
 set -e
 
-# Determine AppDir path
-APPDIR="$(dirname "$(readlink -f "$0")")"
+# Get the directory of this script
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ELECTRON_BIN="$SCRIPT_DIR/node_modules/.bin/electron"
+SANDBOX="$SCRIPT_DIR/node_modules/electron/dist/chrome-sandbox"
 
-# Path to Electron binary in production
-ELECTRON="$APPDIR/node_modules/electron/dist/electron"
-
-# Path to the compiled main file
-APP="$APPDIR/dist-electron/main/index.js"
+# Fix sandbox permissions
+if [[ -f "$SANDBOX" && ! -u "$SANDBOX" ]]; then
+    echo "Fixing sandbox permissions..."
+    sudo chown root:root "$SANDBOX"
+    sudo chmod 4755 "$SANDBOX"
+fi
 
 # Launch the app
-exec "$ELECTRON" "$APP"
+"$ELECTRON_BIN" "$SCRIPT_DIR"
