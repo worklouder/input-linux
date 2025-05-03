@@ -49,7 +49,7 @@ sudo npm install -g asar
 Before launching the app, install the necessary udev rules to allow access to your Work Louder keyboard:
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/BeekrBonkr/input-linux/refs/heads/main/install-udev-worklouder.sh | sudo bash
+curl -sSL https://github.com/BeekrBonkr/input-linux/blob/main/patch/dist-electron/scripts/install-udev-worklouder.sh | sudo bash
 ```
 
 Afterward, **replug your keyboard** and launch the app.
