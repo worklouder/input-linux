@@ -90,8 +90,6 @@ echo "Setting up Node environment..."
 
     # Rebuild native modules (mostly for node-hid)
     npx electron-rebuild -f -w node-hid -v "$ELECTRON_VERSION" || handle_error "electron-rebuild failed"
-
-    npx electron-rebuild -f -w node-hid -v "$ELECTRON_VERSION" || handle_error "electron-rebuild failed"
 )
 
 # Move unpacked app to final destination
