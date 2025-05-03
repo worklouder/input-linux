@@ -57,7 +57,8 @@
     },
     "files": [
       "dist/",
-      "dist-electron/"
+      "dist-electron/",
+      "start.sh"
     ],
     "linux": {
       "target": "AppImage",
