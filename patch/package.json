@@ -1,22 +1,21 @@
 {
   "name": "input",
-  "version": "0.8.0-rc.2",
-  "main": "dist-electron/main/index.js",
+  "version": "0.8.0-rc.2-DevBuild3",
   "description": "Input App - Work Louder",
   "author": "Work Louder",
   "license": "none",
   "private": true,
   "type": "module",
-  "keywords": [],
-  "debug": {
-    "env": {
-      "VITE_DEV_SERVER_URL": "http://127.0.0.1:7777/"
-    }
-  },
+  "main": "dist-electron/main/index.js",
   "scripts": {
     "build": "electron-builder",
     "postinstall": "electron-builder install-app-deps",
     "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "debug": {
+    "env": {
+      "VITE_DEV_SERVER_URL": "http://127.0.0.1:7777/"
+    }
   },
   "dependencies": {
     "@dnd-kit/core": "^6.1.0",
@@ -41,6 +40,7 @@
     "recoil": "^0.7.7",
     "recoil-persist": "^5.1.0",
     "serialport": "^12.0.0",
+    "sudo-prompt": "^9.2.1",
     "web-serial-polyfill": "^1.0.15"
   },
   "devDependencies": {
@@ -56,16 +56,29 @@
       "output": "release"
     },
     "files": [
-      "dist/",
-      "dist-electron/",
-      "start.sh"
+      "dist/**",
+      "dist-electron/**"
+    ],
+    "extraFiles": [
+      {
+        "from": "AppRun",
+        "to": "AppRun",
+        "filter": ["AppRun"]
+      }
+    ],
+    "asarUnpack": [
+      "dist-electron/scripts/install-udev-worklouder.sh"
     ],
     "linux": {
       "target": "AppImage",
       "category": "Utility",
-      "icon": "dist/assets/appicon.png"
+      "icon": "dist/assets/appicon.png",
+      "executableName": "input"
     },
     "npmRebuild": false,
-    "buildDependenciesFromSource": false
+    "buildDependenciesFromSource": false,
+    "extraMetadata": {
+      "main": "dist-electron/main/index.js"
+    }
   }
 }

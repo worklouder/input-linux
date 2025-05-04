@@ -10,6 +10,7 @@ EXTRACT_DIR="./input_extracted"
 REBUILD_DIR="./input_rebuild"
 APP_64_EXTRACT_DIR="$REBUILD_DIR/app-64"
 FINAL_APP_DIR="./input-app"
+PATCH_DIR="./patch"
 ELECTRON_VERSION="29.2.0"
 
 # Required tools check
@@ -83,6 +84,11 @@ echo "Setting up Node environment..."
     npm install --save-dev "electron@$ELECTRON_VERSION" electron-rebuild || handle_error "Failed to install Electron or electron-rebuild"
     npm uninstall node-hid || true
     npm install node-hid --build-from-source || handle_error "node-hid build failed"
+
+    # Install sudo-prompt for main process
+    npm install sudo-prompt || handle_error "Failed to install sudo-prompt"
+
+    # Rebuild native modules (mostly for node-hid)
     npx electron-rebuild -f -w node-hid -v "$ELECTRON_VERSION" || handle_error "electron-rebuild failed"
 )
 
@@ -94,43 +100,20 @@ fi
 
 mv "$UNPACKED_DIR" "$FINAL_APP_DIR"
 
-# Move start.sh and make it executable
-if [[ -f "./start.sh" ]]; then
-    echo "Moving start.sh to $FINAL_APP_DIR"
-    mv ./start.sh "$FINAL_APP_DIR/start.sh"
-    chmod +x "$FINAL_APP_DIR/start.sh"
+# Apply patch files (overwrite existing files, add new ones)
+if [[ -d "$PATCH_DIR" ]]; then
+    echo "Applying patch files from $PATCH_DIR to $FINAL_APP_DIR"
+    cp -a "$PATCH_DIR/." "$FINAL_APP_DIR/"
+    if [[ -f "$FINAL_APP_DIR/AppRun" ]]; then
+        chmod +x "$FINAL_APP_DIR/AppRun"
+    fi
 else
-    echo "start.sh not found, skipping move"
+    echo "No patch directory found at $PATCH_DIR, skipping patch step"
 fi
-
-# Move appicon.png into dist/assets directory of the final app
-ICON_SOURCE="./appicon.png"
-ICON_DEST_DIR="$FINAL_APP_DIR/dist/assets"
-ICON_DEST="$ICON_DEST_DIR/appicon.png"
-
-if [[ -f "$ICON_SOURCE" ]]; then
-    echo "Found appicon.png, moving to $ICON_DEST"
-    mkdir -p "$ICON_DEST_DIR"
-    mv "$ICON_SOURCE" "$ICON_DEST"
-else
-    echo "appicon.png not found in script root, skipping icon move"
-fi
-
-# Copy package.json to the final app directory (overwriting any existing one)
-PACKAGE_SOURCE="./package.json"
-PACKAGE_DEST="$FINAL_APP_DIR/package.json"
-
-if [[ -f "$PACKAGE_SOURCE" ]]; then
-    echo "Copying package.json to $FINAL_APP_DIR"
-    cp -f "$PACKAGE_SOURCE" "$PACKAGE_DEST"
-else
-    echo "package.json not found in script root, skipping copy"
-fi
-
 
 # Cleanup
 echo "Cleaning up temporary files..."
 rm -rf "$DOWNLOAD_DIR" "$EXTRACT_DIR" "$REBUILD_DIR"
 
-echo "Done. Launch the app using:"
+echo "✅ Done. Launch the app using:"
 echo "./input-app/start.sh"

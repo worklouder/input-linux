@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en" style="overflow: hidden;">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/x-icon" href="./favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline' 'unsafe-eval';" />
+    <title>Work Louder - Input</title>
+    <script type="module" crossorigin src="./assets/index-C6O7xkt8.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-BOXYYQsE.css">
+
+    <style>
+      #udev-popup {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.7);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+      }
+
+      #udev-popup-content {
+        background: #fff;
+        padding: 2rem;
+        border-radius: 8px;
+        max-width: 400px;
+        text-align: center;
+        font-family: sans-serif;
+        box-shadow: 0 0 12px rgba(0, 0, 0, 0.5);
+      }
+
+      #udev-popup-content h2 {
+        margin-top: 0;
+      }
+
+      #udev-popup-content button {
+        padding: 10px 20px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        font-size: 1rem;
+        cursor: pointer;
+        margin-top: 1rem;
+      }
+
+      #udev-popup-content button:hover {
+        background-color: #0056b3;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="root"></div>
+
+    <!-- Udev Setup Popup -->
+    <div id="udev-popup">
+      <div id="udev-popup-content">
+        <h2>Device Setup Required</h2>
+        <p>To connect to your Work Louder device, we need to install system permissions.</p>
+        <button id="run-udev-btn">Install Permissions</button>
+      </div>
+    </div>
+
+    <script>
+      window.addEventListener('DOMContentLoaded', () => {
+        const popup = document.getElementById('udev-popup');
+        const btn = document.getElementById('run-udev-btn');
+    
+        // Only show popup if setup hasn't been marked as complete
+        const udevSetupDone = localStorage.getItem('udev-setup-done');
+        if (udevSetupDone === 'true') {
+          popup.style.display = 'none';
+        } else {
+          popup.style.display = 'flex';
+        }
+    
+        btn.addEventListener('click', () => {
+          window.udevHelper?.runUdevSetup?.();
+          popup.style.display = 'none';
+    
+          // Mark as completed so popup doesn't show again
+          localStorage.setItem('udev-setup-done', 'true');
+          //Debugging: localStorage.removeItem('udev-setup-done');
+        });
+      });
+    </script>    
+  </body>
+</html>

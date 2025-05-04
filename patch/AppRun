@@ -1,0 +1,4 @@
+#!/bin/bash
+HERE="$(dirname "$(readlink -f "${0}")")"
+export APPIMAGE=1
+exec "$HERE/input" --no-sandbox "$@"

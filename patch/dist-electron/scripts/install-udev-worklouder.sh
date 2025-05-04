@@ -26,16 +26,21 @@ for DEVICE in "${DEVICES[@]}"; do
     ID_VENDOR=$(echo "$DEVICE" | awk '{print $6}' | cut -d: -f1)
     ID_PRODUCT=$(echo "$DEVICE" | awk '{print $6}' | cut -d: -f2)
 
-    # Build expected rule
-    RULE="SUBSYSTEM==\"usb\", ATTR{idVendor}==\"$ID_VENDOR\", ATTR{idProduct}==\"$ID_PRODUCT\", MODE=\"0666\", SYMLINK+=\"worklouder\""
+    # USB rule (for general access)
+    USB_RULE="SUBSYSTEM==\"usb\", ATTR{idVendor}==\"$ID_VENDOR\", ATTR{idProduct}==\"$ID_PRODUCT\", MODE=\"0666\", GROUP=\"plugdev\", SYMLINK+=\"worklouder\""
 
-    # Check if rule already exists
+    # HIDRAW rule (for raw HID access like /dev/hidrawX)
+    HIDRAW_RULE="KERNEL==\"hidraw*\", SUBSYSTEM==\"hidraw\", ATTRS{idVendor}==\"$ID_VENDOR\", ATTRS{idProduct}==\"$ID_PRODUCT\", MODE=\"0666\", GROUP=\"plugdev\""
+
+    # Check if either rule already exists
     if grep -q "$ID_VENDOR.*$ID_PRODUCT" "$RULE_FILE"; then
-        echo "Rule for $ID_VENDOR:$ID_PRODUCT already exists."
+        echo "Rules for $ID_VENDOR:$ID_PRODUCT already exist."
         RULE_FOUND=true
     else
-        echo "Adding udev rule for $ID_VENDOR:$ID_PRODUCT"
-        echo "$RULE" | sudo tee -a "$RULE_FILE" > /dev/null
+        echo "Adding USB rule for $ID_VENDOR:$ID_PRODUCT"
+        echo "$USB_RULE" | sudo tee -a "$RULE_FILE" > /dev/null
+        echo "Adding HIDRAW rule for $ID_VENDOR:$ID_PRODUCT"
+        echo "$HIDRAW_RULE" | sudo tee -a "$RULE_FILE" > /dev/null
     fi
 done
 

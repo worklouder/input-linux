@@ -17,7 +17,35 @@ By using, copying, modifying, or distributing this software, **you agree to thes
 
 ---
 
-## Requirements
+## Usage
+
+You have two options for using Input on Linux:
+
+### Option 1: Download Prebuilt AppImage
+
+The easiest way to get started is by visiting the [Releases Page](https://github.com/BeekrBonkr/input-linux/releases) and downloading the latest `.AppImage`.
+
+Make the AppImage executable and run it:
+
+We recommend using a tool like [Gear Lever](https://flathub.org/apps/it.mijorus.gearlever)
+
+You may need FUSE in order for the appimage to run.
+```bash
+sudo apt install libfuse2
+```
+
+```bash
+chmod +x Input-*.AppImage
+./Input-*.AppImage
+```
+
+---
+
+### Option 2: Build It Yourself
+
+This option is for users who want to rebuild the application from the official Windows installer.
+
+### Requirements
 
 Before running the setup script, ensure the following tools are installed and accessible in your `$PATH`:
 
@@ -30,7 +58,7 @@ Before running the setup script, ensure the following tools are installed and ac
 | `asar`           | Extract and repack `.asar` Electron archives     | `sudo npm install -g asar`                  |
 | `build-essential`| Required for compiling native modules            | `sudo apt install build-essential`          |
 | `python3`        | Required by some Node.js modules during build    | `sudo apt install python3`                  |
-| `git`            | Used to clone the repository (optional)          | `sudo apt install git`                      |
+| `git`            | Used to clone the repository (optional)          | `sudo apt install git`                      `
 
 You can install most of them in one step:
 
@@ -40,50 +68,19 @@ sudo apt install curl p7zip-full nodejs npm build-essential python3 git
 sudo npm install -g asar
 ```
 
----
-
-## Usage
-
-### Quick Udev Rule Setup
-
-Before launching the app, install the necessary udev rules to allow access to your Work Louder keyboard:
+Run this one-liner:
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/BeekrBonkr/input-linux/refs/heads/main/install-udev-worklouder.sh | sudo bash
+curl -sSL https://raw.githubusercontent.com/BeekrBonkr/input-linux/main/input4linux-0.8.0-rc2.sh | bash
 ```
 
-Afterward, **replug your keyboard** and launch the app.
+This will:
+- Download and extract the Windows `.exe` release
+- Rebuild native modules for Linux
+- Apply community patches
+- Set up a working directory (`input-app/`) to launch from
 
----
-
-### Quick Install (One Command)
-
-```bash
-git clone https://github.com/worklouder/input-linux.git && cd input-linux && chmod +x input4linux-0.8.0-rc2.sh && ./input4linux-0.8.0-rc2.sh
-```
-
----
-
-### Manual Install
-
-#### Step 1: Run the Setup Script
-
-Make the script executable and run it:
-
-```bash
-chmod +x setup.sh
-./setup.sh
-```
-
-The script defaults to **TEST_MODE**, allowing it to continue past non-critical errors. To run in strict mode:
-
-```bash
-TEST_MODE=false ./setup.sh
-```
-
-#### Step 2: Run the App
-
-Once setup is complete, launch the application with:
+Launch it with:
 
 ```bash
 ./input-app/start.sh
@@ -91,10 +88,29 @@ Once setup is complete, launch the application with:
 
 ---
 
+## Optional: Udev Rule Setup
+
+Install the necessary udev rules to allow access to your Work Louder device:
+
+Input *should* automatically create these for you.
+
+```bash
+curl -sSL https://raw.githubusercontent.com/BeekrBonkr/input-linux/main/patch/dist-electron/scripts/install-udev-worklouder.sh | sudo bash
+```
+
+Afterward, **unplug and replug your keyboard** before launching the app.
+
+---
+
 ## Troubleshooting
 
 - If you encounter permission issues with `npm`, consider using [`nvm`](https://github.com/nvm-sh/nvm) to manage Node.js in your user space.
-- If `node-hid` fails to build, confirm that `build-essential` and `python3` are installed and that the Electron version matches compatibility requirements.
+- If `node-hid` fails to build, ensure you have `build-essential` and `python3` installed.
+- The build script defaults to `TEST_MODE=true`, which skips over non-critical errors. You can run it in strict mode like this:
+
+```bash
+TEST_MODE=false ./input4linux-0.8.0-rc2.sh
+```
 
 ---
 
