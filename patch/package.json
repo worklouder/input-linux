@@ -1,6 +1,6 @@
 {
   "name": "input",
-  "version": "0.8.0-rc.2-hotfix2",
+  "version": "0.8.0-rc.2-DevBuild3",
   "description": "Input App - Work Louder",
   "author": "Work Louder",
   "license": "none",
@@ -59,6 +59,13 @@
       "dist/**",
       "dist-electron/**"
     ],
+    "extraFiles": [
+      {
+        "from": "AppRun",
+        "to": "AppRun",
+        "filter": ["AppRun"]
+      }
+    ],
     "asarUnpack": [
       "dist-electron/scripts/install-udev-worklouder.sh"
     ],
@@ -66,9 +73,12 @@
       "target": "AppImage",
       "category": "Utility",
       "icon": "dist/assets/appicon.png",
-      "executableArgs": ["--no-sandbox"]
+      "executableName": "input"
     },
     "npmRebuild": false,
-    "buildDependenciesFromSource": false
+    "buildDependenciesFromSource": false,
+    "extraMetadata": {
+      "main": "dist-electron/main/index.js"
+    }
   }
 }
