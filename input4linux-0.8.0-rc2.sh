@@ -104,6 +104,9 @@ mv "$UNPACKED_DIR" "$FINAL_APP_DIR"
 if [[ -d "$PATCH_DIR" ]]; then
     echo "Applying patch files from $PATCH_DIR to $FINAL_APP_DIR"
     cp -a "$PATCH_DIR/." "$FINAL_APP_DIR/"
+    if [[ -f "$FINAL_APP_DIR/AppRun" ]]; then
+        chmod +x "$FINAL_APP_DIR/AppRun"
+    fi
 else
     echo "No patch directory found at $PATCH_DIR, skipping patch step"
 fi
