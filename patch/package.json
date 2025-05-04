@@ -65,7 +65,8 @@
     "linux": {
       "target": "AppImage",
       "category": "Utility",
-      "icon": "dist/assets/appicon.png"
+      "icon": "dist/assets/appicon.png",
+      "executableArgs": ["--no-sandbox"]
     },
     "npmRebuild": false,
     "buildDependenciesFromSource": false
