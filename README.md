@@ -29,6 +29,11 @@ Make the AppImage executable and run it:
 
 We recommend using a tool like [Gear Lever](https://flathub.org/apps/it.mijorus.gearlever)
 
+You may need FUSE in order for the appimage to run.
+```bash
+sudo apt install libfuse2
+```
+
 ```bash
 chmod +x Input-*.AppImage
 ./Input-*.AppImage
