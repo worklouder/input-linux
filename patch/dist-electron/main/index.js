@@ -1,21 +1,49 @@
-
 // From Input-Linux Patch
 import { app, BrowserWindow, ipcMain } from 'electron';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import sudoPrompt from 'sudo-prompt';
+import fs from 'fs';
+import os from 'os';
+
+if (process.env.APPIMAGE) {
+  app.commandLine.appendSwitch('no-sandbox');
+}
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
+// Handle udev setup request
 ipcMain.on('run-udev-setup', () => {
-  const scriptPath = path.join(__dirname, '../scripts/install-udev-worklouder.sh');
+  const isAppImage = !!process.env.APPIMAGE;
+
+  let sourceScript;
+  if (isAppImage) {
+    // When running as AppImage, use unpacked resources path
+    sourceScript = path.join(process.resourcesPath, 'app.asar.unpacked', 'dist-electron/scripts/install-udev-worklouder.sh');
+  } else {
+    // Dev or unpackaged environment
+    sourceScript = path.join(__dirname, '../scripts/install-udev-worklouder.sh');
+  }
+
+  const tempScript = path.join(os.tmpdir(), 'install-udev-worklouder.sh');
+
+  try {
+    fs.copyFileSync(sourceScript, tempScript);
+    fs.chmodSync(tempScript, 0o755);
+  } catch (err) {
+    console.error('[udev setup] Failed to prepare script:', err);
+    return;
+  }
+
   const options = {
     name: 'Work Louder Configurator',
     prompt: 'The app needs to install udev rules so it can access your Work Louder device. Please enter your password to continue.'
-  };  
-  console.log('Attempting to run sudoPrompt.')
-  sudoPrompt.exec(`bash "${scriptPath}"`, options, (error, stdout, stderr) => {
+  };
+
+  console.log('Attempting to run sudoPrompt.');
+  sudoPrompt.exec(`bash "${tempScript}"`, options, (error, stdout, stderr) => {
     if (error) {
       console.error('[udev setup] Failed with sudo:', error);
     } else {
