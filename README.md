@@ -23,7 +23,7 @@ You have two options for using Input on Linux:
 
 ### Option 1: Download Prebuilt AppImage
 
-The easiest way to get started is by visiting the [Releases Page](https://github.com/BeekrBonkr/input-linux/releases) and downloading the latest `.AppImage`.
+The easiest way to get started is by visiting the [Releases Page](https://github.com/worklouder/input-linux/releases) and downloading the latest `.AppImage`.
 
 Make the AppImage executable and run it:
 
@@ -71,7 +71,7 @@ sudo npm install -g asar
 Run this one-liner:
 
 ```bash
-git clone https://github.com/BeekrBonkr/input-linux.git && cd input-linux && bash input4linux-0.8.0-rc3.sh
+git clone https://github.com/worklouder/input-linux.git && cd input-linux && bash input4linux-0.8.0-rc3.sh
 ```
 
 This will:
@@ -95,7 +95,7 @@ Install the necessary udev rules to allow access to your Work Louder device:
 Input *should* automatically create these for you.
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/BeekrBonkr/input-linux/main/patch/dist-electron/scripts/install-udev-worklouder.sh | sudo bash
+curl -sSL https://raw.githubusercontent.com/worklouder/input-linux/main/patch/dist-electron/scripts/install-udev-worklouder.sh | sudo bash
 ```
 
 Afterward, **unplug and replug your keyboard** before launching the app.
