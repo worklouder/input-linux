@@ -54,7 +54,6 @@ ipcMain.on('run-udev-setup', () => {
 
 // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-
 var G = Object.defineProperty;
 var J = (s, e, t) => e in s ? G(s, e, { enumerable: !0, configurable: !0, writable: !0, value: t }) : s[e] = t;
 var d = (s, e, t) => J(s, typeof e != "symbol" ? e + "" : e, t);
@@ -809,7 +808,6 @@ async function j() {
     h == null || h.webContents.send("main-process-message", (/* @__PURE__ */ new Date()).toLocaleString());
   }), h.webContents.setWindowOpenHandler(({ url: e }) => (e.startsWith("https:") && Z.openExternal(e), { action: "deny" })), le.setUpListeners(h), h;
 }
-
 v.whenReady().then(() => {
   i.info("Application ready"), j().then(z);
 });
