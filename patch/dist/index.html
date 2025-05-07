@@ -7,7 +7,7 @@
     <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline' 'unsafe-eval';" />
     <title>Work Louder - Input</title>
     <script type="module" crossorigin src="./assets/index-t0B2mCca.js"></script>
-    <link rel="stylesheet" crossorigin href="./assets/index-80l_sOZu.css">
+    <link rel="stylesheet" crossorigin href="./assets/index-80l_sOZu.css" />
 
     <style>
       #udev-popup {
@@ -70,7 +70,7 @@
       window.addEventListener('DOMContentLoaded', () => {
         const popup = document.getElementById('udev-popup');
         const btn = document.getElementById('run-udev-btn');
-    
+
         // Only show popup if setup hasn't been marked as complete
         const udevSetupDone = localStorage.getItem('udev-setup-done');
         if (udevSetupDone === 'true') {
@@ -78,16 +78,49 @@
         } else {
           popup.style.display = 'flex';
         }
-    
+
         btn.addEventListener('click', () => {
           window.udevHelper?.runUdevSetup?.();
           popup.style.display = 'none';
-    
-          // Mark as completed so popup doesn't show again
           localStorage.setItem('udev-setup-done', 'true');
-          //Debugging: localStorage.removeItem('udev-setup-done');
+        });
+
+        // Observe the DOM for React-rendered elements
+        const observer = new MutationObserver(() => {
+          // Re-acquire in case it's added late
+          const syncBanner = document.querySelector('[class*="sync_countdown_container"]');
+          const connectionDiv = document.querySelector('[class*="connection_"]');
+
+          if (syncBanner && !syncBanner.dataset.listenerAttached) {
+            syncBanner.style.cursor = 'pointer';
+            syncBanner.title = 'Click to reinstall udev permissions';
+            syncBanner.addEventListener('click', () => {
+              localStorage.removeItem('udev-setup-done');
+              popup.style.display = 'flex';
+            });
+            syncBanner.dataset.listenerAttached = "true";
+          }
+
+          if (connectionDiv && !connectionDiv.dataset.listenerAttached) {
+            connectionDiv.style.cursor = 'pointer';
+            connectionDiv.title = 'Click to reinstall udev permissions';
+            connectionDiv.addEventListener('click', () => {
+              localStorage.removeItem('udev-setup-done');
+              popup.style.display = 'flex';
+            });
+            connectionDiv.dataset.listenerAttached = "true";
+          }
+
+          if (syncBanner && connectionDiv) {
+            observer.disconnect(); // Stop once both are handled
+          }
+        });
+
+        observer.observe(document.body, {
+          childList: true,
+          subtree: true,
         });
       });
-    </script>    
+    </script>
   </body>
 </html>
