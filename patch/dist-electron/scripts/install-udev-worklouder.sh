@@ -37,6 +37,9 @@ fi
 # Add catch-all for HID access
 echo 'SUBSYSTEM=="hidraw", KERNEL=="hidraw*", MODE="0666", GROUP="plugdev", TAG+="uaccess"' | sudo tee -a "$TEMP_FILE" > /dev/null
 
+# Add static rule for ESP32-S3 serial port
+echo 'SUBSYSTEM=="tty", ATTRS{idVendor}=="303a", ATTRS{idProduct}=="1001", MODE="0666", GROUP="plugdev", TAG+="uaccess"' | sudo tee -a "$TEMP_FILE" > /dev/null
+
 # Apply the new rules
 echo "Writing rules to $RULE_FILE"
 sudo mv "$TEMP_FILE" "$RULE_FILE"
