@@ -6,9 +6,9 @@ TEMP_FILE="$(mktemp)"
 MATCH_NAME="Work Louder"
 
 echo "Generating udev rules for \"$MATCH_NAME\" devices..."
-echo "# udev rules for Work Louder devices" | sudo tee "$TEMP_FILE" > /dev/null
+echo "# udev rules for Work Louder and Nomad devices (USB and Bluetooth)" | sudo tee "$TEMP_FILE" > /dev/null
 
-# Parse USB devices
+# Dynamic rules for USB Work Louder devices
 mapfile -t DEVICES < <(lsusb | grep "$MATCH_NAME")
 
 if [[ ${#DEVICES[@]} -eq 0 ]]; then
@@ -23,21 +23,21 @@ else
 
         echo "Adding rules for $ID_VENDOR:$ID_PRODUCT"
 
-        # USB rule
         echo "SUBSYSTEM==\"usb\", ATTR{idVendor}==\"$ID_VENDOR\", ATTR{idProduct}==\"$ID_PRODUCT\", MODE=\"0666\", GROUP=\"plugdev\", SYMLINK+=\"worklouder\"" | sudo tee -a "$TEMP_FILE" > /dev/null
-
-        # HIDRAW rule
         echo "KERNEL==\"hidraw*\", SUBSYSTEM==\"hidraw\", ATTRS{idVendor}==\"$ID_VENDOR\", ATTRS{idProduct}==\"$ID_PRODUCT\", MODE=\"0666\", GROUP=\"plugdev\", TAG+=\"uaccess\"" | sudo tee -a "$TEMP_FILE" > /dev/null
-
-        # Serial rule (ttyACM*, ttyUSB*)
-        echo "SUBSYSTEM==\"tty\", ATTRS{idVendor}==\"$ID_VENDOR\", ATTRS{idProduct}==\"$ID_PRODUCT\", MODE=\"0666\", GROUP=\"plugdev\"" | sudo tee -a "$TEMP_FILE" > /dev/null
+        echo "SUBSYSTEM==\"tty\", ATTRS{idVendor}==\"$ID_VENDOR\", ATTR{idProduct}==\"$ID_PRODUCT\", MODE=\"0666\", GROUP=\"plugdev\", TAG+=\"uaccess\"" | sudo tee -a "$TEMP_FILE" > /dev/null
     done
 fi
 
-# Add catch-all for HID access
-echo 'SUBSYSTEM=="hidraw", KERNEL=="hidraw*", MODE="0666", GROUP="plugdev", TAG+="uaccess"' | sudo tee -a "$TEMP_FILE" > /dev/null
+# --- Static rules for Bluetooth-based Nomad ---
 
-# Add static rule for ESP32-S3 serial port
+# Nomad over Bluetooth HID (Work Louder via BT)
+echo 'KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{idVendor}=="303a", ATTRS{idProduct}=="8294", MODE="0666", GROUP="plugdev", TAG+="uaccess"' | sudo tee -a "$TEMP_FILE" > /dev/null
+
+# Optionally cover future BT devices from Work Louder by vendor ID alone
+echo 'ATTRS{idVendor}=="303a", MODE="0666", GROUP="plugdev", TAG+="uaccess"' | sudo tee -a "$TEMP_FILE" > /dev/null
+
+# Optional: ESP32-S3 serial (used in some dev setups)
 echo 'SUBSYSTEM=="tty", ATTRS{idVendor}=="303a", ATTRS{idProduct}=="1001", MODE="0666", GROUP="plugdev", TAG+="uaccess"' | sudo tee -a "$TEMP_FILE" > /dev/null
 
 # Apply the new rules
