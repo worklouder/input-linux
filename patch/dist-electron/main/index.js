@@ -52,7 +52,7 @@ ipcMain.on('run-udev-setup', () => {
   });
 });
 
-// END LINUX PATCH ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+// ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 var G = Object.defineProperty;
 var J = (s, e, t) => e in s ? G(s, e, { enumerable: !0, configurable: !0, writable: !0, value: t }) : s[e] = t;
@@ -103,13 +103,9 @@ class ie {
       this.installUpdate();
     });
   }
-// Linux Patch - Prevent os notification and auto downloading  
   checkForUpdates() {
-    this.updater.autoDownload = false;
-    this.updater.autoInstallOnAppQuit = false;
-    this.updater.checkForUpdates();
+    this.updater.checkForUpdatesAndNotify();
   }
-// ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ 
   installUpdate() {
     this.updater.quitAndInstall();
   }
