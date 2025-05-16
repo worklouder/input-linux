@@ -18,20 +18,17 @@ const __dirname = dirname(__filename);
 ipcMain.on('run-udev-setup', () => {
   const isAppImage = !!process.env.APPIMAGE;
 
-  let sourceScript;
-  if (isAppImage) {
-    // When running as AppImage, use unpacked resources path
-    sourceScript = path.join(process.resourcesPath, 'app.asar.unpacked', 'dist-electron/scripts/install-udev-worklouder.sh');
-  } else {
-    // Dev or unpackaged environment
-    sourceScript = path.join(__dirname, '../scripts/install-udev-worklouder.sh');
-  }
-
+  const sourceScript = isAppImage
+    ? path.join(process.resourcesPath, 'app.asar.unpacked', 'dist-electron/scripts/install-udev-worklouder.sh')
+    : path.join(__dirname, '../scripts/install-udev-worklouder.sh');
   const tempScript = path.join(os.tmpdir(), 'install-udev-worklouder.sh');
 
   try {
-    fs.copyFileSync(sourceScript, tempScript);
-    fs.chmodSync(tempScript, 0o755);
+    // Only copy if source and temp are different
+    if (sourceScript !== tempScript) {
+      fs.copyFileSync(sourceScript, tempScript);
+      fs.chmodSync(tempScript, 0o755);
+    }
   } catch (err) {
     console.error('[udev setup] Failed to prepare script:', err);
     return;
