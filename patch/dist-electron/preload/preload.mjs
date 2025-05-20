@@ -1,14 +1,18 @@
 // From Input-Linux Patch
 
-try {
-    const { contextBridge, ipcRenderer } = require('electron');
-  
-    contextBridge.exposeInMainWorld('udevHelper', {
-      runUdevSetup: () => ipcRenderer.send('run-udev-setup'),
-    });
-  } catch (err) {
-    console.error('[udevHelper] preload script failed to expose udevHelper:', err);
-  }
+const { contextBridge, ipcRenderer } = require('electron');
+
+contextBridge.exposeInMainWorld('udevHelper', {
+  runUdevSetup: () => {
+    try {
+      ipcRenderer.send('run-udev-setup');
+      return { success: true };
+    } catch (error) {
+      console.error('Failed to run udev setup:', error);
+      return { success: false, error: error.message };
+    }
+  },
+});
 
 //^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
