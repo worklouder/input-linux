@@ -1,13 +1,15 @@
 <!DOCTYPE html>
-<html lang="en" style="overflow: hidden;">
+<html lang="en"
+  style="overflow: hidden;"
+>
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/x-icon" href="./favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline' 'unsafe-eval';" />
     <title>Work Louder - Input</title>
-    <script type="module" crossorigin src="./assets/index-t0B2mCca.js"></script>
-    <link rel="stylesheet" crossorigin href="./assets/index-80l_sOZu.css" />
+    <script type="module" crossorigin src="./assets/index-j14pbwa3.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-80l_sOZu.css">
 
     <style>
       #udev-popup {
@@ -70,7 +72,7 @@
       window.addEventListener('DOMContentLoaded', () => {
         const popup = document.getElementById('udev-popup');
         const btn = document.getElementById('run-udev-btn');
-
+    
         // Only show popup if setup hasn't been marked as complete
         const udevSetupDone = localStorage.getItem('udev-setup-done');
         if (udevSetupDone === 'true') {
@@ -78,19 +80,19 @@
         } else {
           popup.style.display = 'flex';
         }
-
+    
         btn.addEventListener('click', () => {
           window.udevHelper?.runUdevSetup?.();
           popup.style.display = 'none';
           localStorage.setItem('udev-setup-done', 'true');
         });
-
+    
         // Observe the DOM for React-rendered elements
         const observer = new MutationObserver(() => {
-          // Re-acquire in case it's added late
           const syncBanner = document.querySelector('[class*="sync_countdown_container"]');
           const connectionDiv = document.querySelector('[class*="connection_"]');
-
+          const releaseButton = document.querySelector('._release__button_1jm4y_1');
+    
           if (syncBanner && !syncBanner.dataset.listenerAttached) {
             syncBanner.style.cursor = 'pointer';
             syncBanner.title = 'Click to reinstall udev permissions';
@@ -100,7 +102,7 @@
             });
             syncBanner.dataset.listenerAttached = "true";
           }
-
+    
           if (connectionDiv && !connectionDiv.dataset.listenerAttached) {
             connectionDiv.style.cursor = 'pointer';
             connectionDiv.title = 'Click to reinstall udev permissions';
@@ -110,17 +112,29 @@
             });
             connectionDiv.dataset.listenerAttached = "true";
           }
+    
+          if (releaseButton && !releaseButton.dataset.listenerAttached) {
+            releaseButton.style.cursor = 'pointer';
+            releaseButton.title = 'View latest releases on GitHub';
+            releaseButton.innerText = 'New Input version available. View on GitHub!';
+            releaseButton.addEventListener('click', () => {
+              window.open('https://github.com/worklouder/input-linux/releases', '_blank');
+            });
+            releaseButton.dataset.listenerAttached = "true";
+          }
 
-          if (syncBanner && connectionDiv) {
-            observer.disconnect(); // Stop once both are handled
+    
+          if (syncBanner && connectionDiv && releaseButton) {
+            observer.disconnect(); // Stop once all are handled
           }
         });
-
+    
         observer.observe(document.body, {
           childList: true,
           subtree: true,
         });
       });
     </script>
+    
   </body>
 </html>

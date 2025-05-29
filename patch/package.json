@@ -1,6 +1,6 @@
 {
   "name": "input",
-  "version": "0.8.0-rc.3-DevBuild3",
+  "version": "0.8.0-rc.4-DevBuild",
   "description": "Input App - Work Louder",
   "author": "Work Louder",
   "license": "none",
@@ -49,6 +49,13 @@
     "electron-rebuild": "^3.2.9"
   },
   "build": {
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "worklouder",
+        "repo": "input-linux"
+      }
+    ],
     "appId": "com.worklouder.input",
     "productName": "Input",
     "directories": {
