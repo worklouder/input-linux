@@ -71,7 +71,7 @@ sudo npm install -g asar
 Run this one-liner:
 
 ```bash
-git clone https://github.com/worklouder/input-linux.git && cd input-linux && bash input4linux-0.8.0-rc5.sh
+git clone https://github.com/worklouder/input-linux.git && cd input-linux && bash input4linux-0.8.0-rc7.sh
 ```
 
 This will:
