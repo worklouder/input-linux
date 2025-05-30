@@ -3,8 +3,8 @@ set -euo pipefail
 
 # Configuration
 TEST_MODE="${TEST_MODE:-true}"
-URL="https://github.com/worklouder/input-releases/releases/download/v0.8.0-rc.4/input-Setup-0.8.0-rc.4.exe"
-FILENAME="input-Setup-0.8.0-rc.4.exe"
+URL="https://github.com/worklouder/input-releases/releases/download/v0.8.0-rc.5/input-Setup-0.8.0-rc.5.exe"
+FILENAME="input-Setup-0.8.0-rc.5.exe"
 DOWNLOAD_DIR="./input_download"
 EXTRACT_DIR="./input_extracted"
 REBUILD_DIR="./input_rebuild"
