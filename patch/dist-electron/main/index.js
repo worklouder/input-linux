@@ -51,17 +51,17 @@ ipcMain.on('run-udev-setup', () => {
 
 // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-var G = Object.defineProperty;
-var J = (s, e, t) => e in s ? G(s, e, { enumerable: !0, configurable: !0, writable: !0, value: t }) : s[e] = t;
-var d = (s, e, t) => J(s, typeof e != "symbol" ? e + "" : e, t);
-import { ipcMain as p, BrowserWindow as T, app as v, Menu as P, shell as Z } from "electron";
+var J = Object.defineProperty;
+var Z = (s, e, t) => e in s ? J(s, e, { enumerable: !0, configurable: !0, writable: !0, value: t }) : s[e] = t;
+var d = (s, e, t) => Z(s, typeof e != "symbol" ? e + "" : e, t);
+import { ipcMain as p, BrowserWindow as T, app as v, Menu as E, shell as $ } from "electron";
 import { release as K } from "node:os";
-import { dirname as Q, join as k } from "node:path";
+import { dirname as Q, join as P } from "node:path";
 import { fileURLToPath as X } from "node:url";
 import i from "electron-log";
 import Y from "electron-updater";
 import { devices as _, HIDAsync as H } from "node-hid";
-import { SerialPort as A, DelimiterParser as ee } from "serialport";
+import { SerialPort as B, DelimiterParser as ee } from "serialport";
 import { download as ne, CancelError as te } from "electron-dl";
 import * as g from "fs";
 import { join as y } from "path";
@@ -107,7 +107,7 @@ class ie {
     this.updater.quitAndInstall();
   }
 }
-const $ = [
+const q = [
   {
     label: "input",
     submenu: [
@@ -262,19 +262,19 @@ class W {
     this.portPath = e, this.devicePid = t, this.connectionType = r, this.deviceType = a, this.layoutType = o, this.isUsbConnection = l;
   }
 }
-var I = /* @__PURE__ */ ((s) => (s.NomadE = "nomad_e", s.Knob = "knob", s))(I || {}), D = /* @__PURE__ */ ((s) => (s.unknown = "unknown", s.ansi = "ansi", s.iso = "iso", s))(D || {}), U = /* @__PURE__ */ ((s) => (s.searchDevices = "searchDevices", s.searchForDeviceInBootloader = "searchForDeviceInBootloader", s))(U || {});
+var I = /* @__PURE__ */ ((s) => (s.NomadE = "nomad_e", s.Knob = "knob", s))(I || {}), D = /* @__PURE__ */ ((s) => (s.unknown = "unknown", s.ansi = "ansi", s.iso = "iso", s))(D || {}), A = /* @__PURE__ */ ((s) => (s.searchDevices = "searchDevices", s.searchForDeviceInBootloader = "searchForDeviceInBootloader", s))(A || {});
 const f = class f {
   constructor() {
     d(this, "win", null);
     this.createHandlers();
   }
   createHandlers() {
-    i.info("Adding listeners for devices manager channel"), p.handle(U.searchDevices, this.searchDevices), p.handle(U.searchForDeviceInBootloader, this.searchForDeviceInBootloader);
+    i.info("Adding listeners for devices manager channel"), p.handle(A.searchDevices, this.searchDevices), p.handle(A.searchForDeviceInBootloader, this.searchForDeviceInBootloader);
   }
   async searchForDeviceInBootloader() {
     const e = process.platform === "win32";
     try {
-      const t = await A.list();
+      const t = await B.list();
       let r = [];
       return t.forEach((a) => {
         var c;
@@ -298,9 +298,9 @@ const f = class f {
     )), t.length === 0)
       return [];
     let r = [];
-    return t.find((o) => o.productId === f.legacyNomadPid) !== void 0 && (t = t.filter((c) => c.productId !== f.legacyNomadPid), (await A.list()).filter((c) => parseInt(c.productId ?? "", 16) === f.legacyNomadPid).forEach((c) => {
+    return t.find((o) => o.productId === f.legacyNomadPid) !== void 0 && (t = t.filter((c) => c.productId !== f.legacyNomadPid), (await B.list()).filter((c) => parseInt(c.productId ?? "", 16) === f.legacyNomadPid).forEach((c) => {
       const u = f.getDeviceFromSerialPort(c);
-      u !== void 0 && r.find((B) => u.portPath === B.portPath) === void 0 && r.push(u);
+      u !== void 0 && r.find((N) => u.portPath === N.portPath) === void 0 && r.push(u);
     })), t.forEach((o) => {
       const l = f.getDeviceFromHIDDevice(o);
       if (t === void 0 || o.usagePage !== 65280)
@@ -341,7 +341,7 @@ const f = class f {
   }
 };
 d(f, "legacyNomadPid", 4097), d(f, "nomadPids", /* @__PURE__ */ new Map([[4097, D.unknown], [33428, D.ansi], [33429, D.iso]])), d(f, "knobPids", /* @__PURE__ */ new Map([[21845, D.unknown]])), d(f, "vid", 12346), d(f, "manufacturers", ["Work Louder", "Work_Louder"]);
-let N = f;
+let x = f;
 var w = /* @__PURE__ */ ((s) => (s.isConnected = "isConnected", s.connect = "connect", s.disconnect = "disconnect", s.getConnectedDevice = "getConnectedDevice", s.sendLegacyRpcCall = "sendLegacyRpcCall", s.sendJsonRpcCall = "sendJsonRpcCall", s.onCloseEvent = "onCloseEvent", s.onErrorEvent = "onErrorEvent", s))(w || {});
 const n = class n {
   // Private constructor prevents direct instantiation
@@ -397,7 +397,7 @@ const n = class n {
     if (n.instance.connectionType === m.serial)
       return Promise.resolve(n.instance.serialDevice ?? void 0);
     const e = await ((t = n.instance.connectedDevice) == null ? void 0 : t.getDeviceInfo());
-    return Promise.resolve(e !== void 0 ? N.getDeviceFromHIDDevice(e) : void 0);
+    return Promise.resolve(e !== void 0 ? x.getDeviceFromHIDDevice(e) : void 0);
   }
   isConnected() {
     if (n.instance.connectionType == m.hid) {
@@ -425,7 +425,7 @@ const n = class n {
       t = c;
     }), a = 115200;
     i.info(e.portPath);
-    const o = new A({ path: e.portPath, baudRate: a, autoOpen: !1 });
+    const o = new B({ path: e.portPath, baudRate: a, autoOpen: !1 });
     return o.on("open", () => {
       i.info("Connection opened");
     }), o.on("close", () => {
@@ -494,13 +494,13 @@ const n = class n {
         for (; c < e.length; ) {
           const F = Math.min(61, e.length - c);
           console.log(`Sending packet ${u} with ${F} bytes, offset: ${c}`);
-          const E = Buffer.alloc(64);
-          E[0] = 6, E[1] = n.CHANNEL_RPC, E[2] = F, l.copy(E, 3, c, c + F);
-          const ue = await ((a = n.instance.connectedDevice) == null ? void 0 : a.write(E));
+          const k = Buffer.alloc(64);
+          k[0] = 6, k[1] = n.CHANNEL_RPC, k[2] = F, l.copy(k, 3, c, c + F);
+          const ue = await ((a = n.instance.connectedDevice) == null ? void 0 : a.write(k));
           c += F, u++, c < e.length;
         }
-        const B = (Date.now() - r) / 1e3;
-        return i.info(`Send complete: ${u - 1} packets, ${e.length} bytes in ${B.toFixed(3)} seconds`), !0;
+        const N = (Date.now() - r) / 1e3;
+        return i.info(`Send complete: ${u - 1} packets, ${e.length} bytes in ${N.toFixed(3)} seconds`), !0;
       } else {
         const l = Buffer.alloc(64);
         l[0] = 6, l[1] = n.CHANNEL_RPC, l[2] = e.length, Buffer.from(e).copy(l, 3, 0, e.length);
@@ -616,7 +616,7 @@ const n = class n {
   }
 };
 d(n, "nomadPids", /* @__PURE__ */ new Map([[4097, D.unknown], [33428, D.ansi], [33429, D.iso]])), d(n, "knobPids", /* @__PURE__ */ new Map([[21845, D.unknown]])), d(n, "CHANNEL_DEBUG", 1), d(n, "CHANNEL_RPC", 2), d(n, "instance");
-let x = n;
+let U = n;
 var b = /* @__PURE__ */ ((s) => (s.downloadFile = "downloadFile", s.deleteFile = "deleteFile", s.saveBackupFile = "saveBackupFile", s.getBackupFiles = "getBackupFiles", s.deleteBackupFiles = "deleteBackupFiles", s.getWallpaperImage = "getWallpaperImage", s.saveWallpaperImage = "saveWallpaperImage", s.deleteWallpaperImage = "deleteWallpaperImage", s.readFile = "readFile", s))(b || {});
 class ae {
   constructor(e, t) {
@@ -717,7 +717,7 @@ class oe {
     }
   }
 }
-var R = /* @__PURE__ */ ((s) => (s.appVersion = "app-version", s.mainLog = "main-log", s.openDevTools = "open-dev-tools", s.enableMenuShortcuts = "enable-menu-shortcuts", s.disableMenuShortcuts = "disable-menu-shortcuts", s.openMacSettings = "open-mac-settings", s))(R || {});
+var R = /* @__PURE__ */ ((s) => (s.appVersion = "app-version", s.mainLog = "main-log", s.openDevTools = "open-dev-tools", s.enableMenuShortcuts = "enable-menu-shortcuts", s.disableMenuShortcuts = "disable-menu-shortcuts", s.openMacSettings = "open-mac-settings", s.openExternalTab = "open-external-tab", s))(R || {});
 class ce {
   constructor() {
     d(this, "platform");
@@ -731,7 +731,7 @@ class ce {
     this.win = e, this.createWindowDependantHandlers();
   }
   createWindowDependantHandlers() {
-    p.handle(R.openDevTools, (e) => this.openDevTools()), p.handle(R.enableMenuShortcuts, (e) => this.enableMenuShortcuts()), p.handle(R.disableMenuShortcuts, (e) => this.disableMenuShortcuts());
+    p.handle(R.openDevTools, (e) => this.openDevTools()), p.handle(R.enableMenuShortcuts, (e) => this.enableMenuShortcuts()), p.handle(R.disableMenuShortcuts, (e) => this.disableMenuShortcuts()), p.handle(R.openExternalTab, (e, t) => this.openExternalTab(t));
   }
   async appVersion() {
     try {
@@ -746,36 +746,39 @@ class ce {
   }
   enableMenuShortcuts() {
     var t;
-    const e = P.buildFromTemplate(C);
-    return P.setApplicationMenu(e), (t = this.win) == null || t.setMenu(e), Promise.resolve();
+    const e = E.buildFromTemplate(C);
+    return E.setApplicationMenu(e), (t = this.win) == null || t.setMenu(e), Promise.resolve();
   }
   disableMenuShortcuts() {
     var t;
     i.info("Disabling menu shortcuts");
-    const e = P.buildFromTemplate($);
-    return P.setApplicationMenu(e), (t = this.win) == null || t.setMenu(e), Promise.resolve();
+    const e = E.buildFromTemplate(q);
+    return E.setApplicationMenu(e), (t = this.win) == null || t.setMenu(e), Promise.resolve();
   }
   openMacSettings() {
     return i.info("Opening mac settings"), re('open "x-apple.systempreferences:com.apple.preference.security?Privacy_ListenEvent"'), Promise.resolve();
+  }
+  openExternalTab(e) {
+    return i.info("Opening external tab at url: ", e), $.openExternal(e), Promise.resolve();
   }
   onMainLog(e) {
   }
 }
 globalThis.__filename = X(import.meta.url);
 globalThis.__dirname = Q(__filename);
-process.env.DIST_ELECTRON = k(__dirname, "../");
-process.env.DIST = k(process.env.DIST_ELECTRON, "../dist");
-process.env.VITE_PUBLIC = process.env.VITE_DEV_SERVER_URL ? k(process.env.DIST_ELECTRON, "../public") : process.env.DIST;
+process.env.DIST_ELECTRON = P(__dirname, "../");
+process.env.DIST = P(process.env.DIST_ELECTRON, "../dist");
+process.env.VITE_PUBLIC = process.env.VITE_DEV_SERVER_URL ? P(process.env.DIST_ELECTRON, "../public") : process.env.DIST;
 process.env.VERSION = v.getVersion();
 K().startsWith("6.1") && v.disableHardwareAcceleration();
 process.platform === "win32" && v.setAppUserModelId(v.getName());
 v.requestSingleInstanceLock() || (v.quit(), process.exit(0));
 let h = null;
-const q = k(__dirname, "../preload/preload.mjs"), S = process.env.VITE_DEV_SERVER_URL, O = k(process.env.DIST, "index.html"), le = new ie(), de = new N(), pe = new ce(), V = x.getInstance();
-P.buildFromTemplate($);
-const M = P.buildFromTemplate(C);
-S || P.setApplicationMenu(M);
-async function j() {
+const O = P(__dirname, "../preload/preload.mjs"), S = process.env.VITE_DEV_SERVER_URL, V = P(process.env.DIST, "index.html"), le = new ie(), de = new x(), pe = new ce(), j = U.getInstance();
+E.buildFromTemplate(q);
+const M = E.buildFromTemplate(C);
+S || E.setApplicationMenu(M);
+async function z() {
   i.initialize(), i.transports.console.format = "{h}:{i}:{s} {text}", i.transports.ipc.level = "silly";
   const s = Object.assign(
     (e) => {
@@ -789,9 +792,9 @@ async function j() {
   );
   return i.transports.ipc = s, i.info("Creating window"), h = new T({
     title: "Work Louder - Input",
-    icon: k(process.env.VITE_PUBLIC, "./assets/icon.ico"),
+    icon: P(process.env.VITE_PUBLIC, "./assets/icon.ico"),
     webPreferences: {
-      preload: q
+      preload: O
     },
     width: 1266,
     height: 793,
@@ -801,37 +804,37 @@ async function j() {
     i.info("GOT TO PORT SELECTION"), e.preventDefault();
     let o = t.find((l) => l.vendorId == "12346" && l.productId == "4097");
     a(o ? o.portId : "");
-  }), S ? (h.loadURL(S), h.webContents.openDevTools()) : h.loadFile(O), h.webContents.on("did-finish-load", () => {
+  }), S ? (h.loadURL(S), h.webContents.openDevTools()) : h.loadFile(V), h.webContents.on("did-finish-load", () => {
     h == null || h.webContents.send("main-process-message", (/* @__PURE__ */ new Date()).toLocaleString());
-  }), h.webContents.setWindowOpenHandler(({ url: e }) => (e.startsWith("https:") && Z.openExternal(e), { action: "deny" })), le.setUpListeners(h), h;
+  }), h.webContents.setWindowOpenHandler(({ url: e }) => (e.startsWith("https:") && $.openExternal(e), { action: "deny" })), le.setUpListeners(h), h;
 }
 v.whenReady().then(() => {
-  i.info("Application ready"), j().then(z);
+  i.info("Application ready"), z().then(G);
 });
 v.on("window-all-closed", () => {
-  h = null, V.disconnect(), process.platform !== "darwin" && v.quit();
+  h = null, j.disconnect(), process.platform !== "darwin" && v.quit();
 });
 v.on("second-instance", () => {
   i.info("second istance"), h && (h.isMinimized() && h.restore(), h.focus());
 });
 v.on("activate", () => {
   const s = T.getAllWindows();
-  i.info("activate"), s.length ? s[0].focus() : j().then(z);
+  i.info("activate"), s.length ? s[0].focus() : z().then(G);
 });
 v.on("before-quit", () => {
-  V.disconnect();
+  j.disconnect();
 });
 p.handle("open-win", (s, e) => {
   i.info("New win");
   const t = new T({
     webPreferences: {
-      preload: q,
+      preload: O,
       nodeIntegration: !1,
       contextIsolation: !0
     }
   });
-  process.env.VITE_DEV_SERVER_URL ? t.loadURL(`${S}#${e}`) : t.loadFile(O, { hash: e });
+  process.env.VITE_DEV_SERVER_URL ? t.loadURL(`${S}#${e}`) : t.loadFile(V, { hash: e });
 });
-function z(s) {
+function G(s) {
   de.setWindow(s), pe.setWindow(s), new oe(s);
 }
