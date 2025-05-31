@@ -26,6 +26,7 @@
       }
 
       #udev-popup-content {
+        position: relative;
         background: #fff;
         padding: 2rem;
         border-radius: 8px;
@@ -53,6 +54,25 @@
       #udev-popup-content button:hover {
         background-color: #0056b3;
       }
+
+      #udev-close-btn {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        background: transparent;
+        border: none;
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: #666;
+        cursor: pointer;
+        padding: 0;
+        line-height: 1;
+      }
+
+      #udev-close-btn:hover {
+        color: #000;
+      }
+
     </style>
   </head>
 
@@ -62,6 +82,7 @@
     <!-- Udev Setup Popup -->
     <div id="udev-popup">
       <div id="udev-popup-content">
+        <button id="udev-close-btn" title="Close popup">×</button>
         <h2>Device Setup Required</h2>
         <p>To connect to your Work Louder device, we need to install system permissions.</p>
         <button id="run-udev-btn">Install Permissions</button>
@@ -73,6 +94,11 @@
         const popup = document.getElementById('udev-popup');
         const btn = document.getElementById('run-udev-btn');
     
+        const closeBtn = document.getElementById('udev-close-btn');
+        closeBtn.addEventListener('click', () => {
+          popup.style.display = 'none';
+        });
+
         // Only show popup if setup hasn't been marked as complete
         const udevSetupDone = localStorage.getItem('udev-setup-done');
         if (udevSetupDone === 'true') {
@@ -90,18 +116,19 @@
         // Observe the DOM for React-rendered elements
         const observer = new MutationObserver(() => {
           const syncBanner = document.querySelector('[class*="sync_countdown_container"]');
-          const connectionDiv = document.querySelector('[class*="connection_"]');
           const releaseButton = document.querySelector('._release__button_1jm4y_1');
     
-          if (syncBanner && !syncBanner.dataset.listenerAttached) {
-            syncBanner.style.cursor = 'pointer';
-            syncBanner.title = 'Click to reinstall udev permissions';
-            syncBanner.addEventListener('click', () => {
+          const connectionText = document.querySelector('._connection__text_vh5hj_19');
+          if (connectionText && !connectionText.dataset.listenerAttached) {
+            connectionText.style.cursor = 'pointer';
+            connectionText.title = 'Click to reinstall udev permissions';
+            connectionText.addEventListener('click', () => {
               localStorage.removeItem('udev-setup-done');
               popup.style.display = 'flex';
             });
-            syncBanner.dataset.listenerAttached = "true";
+            connectionText.dataset.listenerAttached = "true";
           }
+
     
           if (connectionDiv && !connectionDiv.dataset.listenerAttached) {
             connectionDiv.style.cursor = 'pointer';
@@ -124,7 +151,7 @@
           }
 
     
-          if (syncBanner && connectionDiv && releaseButton) {
+          if (syncBanner && connectionText && releaseButton) {
             observer.disconnect(); // Stop once all are handled
           }
         });
