@@ -10,7 +10,7 @@
     <title>Work Louder - Input</title>
     <script type="module" crossorigin src="./assets/index-vE7FG6iT.js"></script>
     <link rel="stylesheet" crossorigin href="./assets/index-80l_sOZu.css">
-    
+
     <style>
       #udev-popup {
         position: fixed;
@@ -85,7 +85,11 @@
         <button id="udev-close-btn" title="Close popup">×</button>
         <h2>Device Setup Required</h2>
         <p>To connect to your Work Louder device, we need to install system permissions.</p>
-        <button id="run-udev-btn">Install Permissions</button>
+        <div style="display: flex; justify-content: center; gap: 1rem; margin-top: 1rem;">
+          <button id="run-udev-btn">Install Permissions</button>
+          <button id="hide-udev-btn">Don't show again</button>
+        </div>
+
       </div>
     </div>
 
@@ -93,7 +97,7 @@
       window.addEventListener('DOMContentLoaded', () => {
         const popup = document.getElementById('udev-popup');
         const btn = document.getElementById('run-udev-btn');
-    
+
         const closeBtn = document.getElementById('udev-close-btn');
         closeBtn.addEventListener('click', () => {
           popup.style.display = 'none';
@@ -101,34 +105,36 @@
 
         // Only show popup if setup hasn't been marked as complete
         const udevSetupDone = localStorage.getItem('udev-setup-done');
-        if (udevSetupDone === 'true') {
-          popup.style.display = 'none';
-        } else {
-          popup.style.display = 'flex';
-        }
-    
+        popup.style.display = udevSetupDone === 'true' ? 'none' : 'flex';
+
         btn.addEventListener('click', () => {
           window.udevHelper?.runUdevSetup?.();
           popup.style.display = 'none';
           localStorage.setItem('udev-setup-done', 'true');
         });
-    
-        // Observe the DOM for React-rendered elements
+
+        const hideBtn = document.getElementById('hide-udev-btn');
+        hideBtn.addEventListener('click', () => {
+          localStorage.setItem('udev-setup-done', 'true');
+          popup.style.display = 'none';
+        });
+
+        // Observe the DOM for dynamically rendered items
         const observer = new MutationObserver(() => {
           const syncBanner = document.querySelector('[class*="sync_countdown_container"]');
           const releaseButton = document.querySelector('._release__button_1jm4y_1');
-    
+
           const connectionText = document.querySelector('._connection__text_vh5hj_19');
           if (connectionText && !connectionText.dataset.listenerAttached) {
             connectionText.style.cursor = 'pointer';
             connectionText.title = 'Click to reinstall udev permissions';
             connectionText.addEventListener('click', () => {
-              localStorage.setItem('udev-setup-done', 'true');
+              localStorage.removeItem('udev-setup-done');
               popup.style.display = 'flex';
             });
             connectionText.dataset.listenerAttached = "true";
           }
-    
+
           if (releaseButton && !releaseButton.dataset.listenerAttached) {
             releaseButton.style.cursor = 'pointer';
             releaseButton.title = 'View latest releases on GitHub';
@@ -139,17 +145,31 @@
             releaseButton.dataset.listenerAttached = "true";
           }
 
-    
+          // Inject menu item once the menu exists
+          const inputMenu = document.querySelector('#input-dropdown-menu');
+          if (inputMenu && !document.getElementById('udev-menu-item')) {
+            const udevItem = document.createElement('li');
+            udevItem.textContent = 'Run Udev Setup';
+            udevItem.id = 'udev-menu-item';
+            udevItem.style.cursor = 'pointer';
+            udevItem.addEventListener('click', () => {
+              localStorage.removeItem('udev-setup-done');
+              popup.style.display = 'flex';
+            });
+            inputMenu.appendChild(udevItem);
+          }
+
           if (syncBanner && connectionText && releaseButton) {
             observer.disconnect(); // Stop once all are handled
           }
         });
-    
+
         observer.observe(document.body, {
           childList: true,
           subtree: true,
         });
       });
+
     </script>
     
   </body>
