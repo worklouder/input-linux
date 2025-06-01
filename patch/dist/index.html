@@ -123,7 +123,7 @@
             connectionText.style.cursor = 'pointer';
             connectionText.title = 'Click to reinstall udev permissions';
             connectionText.addEventListener('click', () => {
-              localStorage.removeItem('udev-setup-done');
+              localStorage.setItem('udev-setup-done', 'true');
               popup.style.display = 'flex';
             });
             connectionText.dataset.listenerAttached = "true";
