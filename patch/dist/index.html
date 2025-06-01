@@ -128,17 +128,6 @@
             });
             connectionText.dataset.listenerAttached = "true";
           }
-
-    
-          if (connectionDiv && !connectionDiv.dataset.listenerAttached) {
-            connectionDiv.style.cursor = 'pointer';
-            connectionDiv.title = 'Click to reinstall udev permissions';
-            connectionDiv.addEventListener('click', () => {
-              localStorage.removeItem('udev-setup-done');
-              popup.style.display = 'flex';
-            });
-            connectionDiv.dataset.listenerAttached = "true";
-          }
     
           if (releaseButton && !releaseButton.dataset.listenerAttached) {
             releaseButton.style.cursor = 'pointer';
