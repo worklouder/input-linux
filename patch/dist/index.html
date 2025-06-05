@@ -88,7 +88,7 @@
         <button id="udev-close-btn" title="Close popup">×</button>
         <h2>Device Setup Required</h2>
         <h4>To enable access to your Work Louder device, run the following command in a terminal:</4>
-        <pre style="background:#f3f3f3;padding:0.5em;border-radius:5px;font-size:0.85em;overflow:auto;">curl -sSL https://input.worklouder.com/install-udev | bash</pre>
+        <pre style="background:#f3f3f3;padding:0.5em;border-radius:5px;font-size:0.85em;overflow:auto;">curl -sSL https://raw.githubusercontent.com/worklouder/input-linux/main/patch/dist-electron/scripts/install-udev-worklouder.sh | sudo bash</pre>
         <div style="display: flex; justify-content: center; gap: 1rem; margin-top: 1rem;">
           <button id="run-udev-btn">Copy</button>
           <button id="hide-udev-btn">Don't show again</button>
