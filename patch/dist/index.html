@@ -112,7 +112,7 @@
         popup.style.display = udevSetupDone === 'true' ? 'none' : 'flex';
 
         btn.addEventListener('click', () => {
-          const command = 'curl -sSL https://input.worklouder.com/install-udev | bash';
+          const command = 'curl -sSL https://raw.githubusercontent.com/worklouder/input-linux/main/patch/dist-electron/scripts/install-udev-worklouder.sh | sudo bash';
           navigator.clipboard.writeText(command).then(() => {
             alert('Command copied to clipboard:\n\n' + command);
           }).catch(() => {
