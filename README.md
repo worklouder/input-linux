@@ -29,12 +29,10 @@ Make the AppImage executable and run it:
 
 We recommend using a tool like [Gear Lever](https://flathub.org/apps/it.mijorus.gearlever)
 
-You may need FUSE in order for the appimage to run.
-```bash
-sudo apt install libfuse2
-```
+You may need FUSE in order for the AppImage to run.
 
 ```bash
+sudo apt install libfuse2
 chmod +x Input-*.AppImage
 ./Input-*.AppImage
 ```
@@ -49,38 +47,46 @@ This option is for users who want to rebuild the application from the official W
 
 Before running the setup script, ensure the following tools are installed and accessible in your `$PATH`:
 
-| Tool             | Purpose                                         | Ubuntu/Debian Install Command               |
-|------------------|--------------------------------------------------|---------------------------------------------|
-| `curl`           | Download files over HTTP(S)                      | `sudo apt install curl`                     |
-| `7z`             | Extract `.exe` and `.7z` archives (`p7zip-full`) | `sudo apt install p7zip-full`               |
-| `node`           | JavaScript runtime                               | `sudo apt install nodejs`                   |
-| `npm`            | Node.js package manager                          | `sudo apt install npm`                      |
-| `asar`           | Extract and repack `.asar` Electron archives     | `sudo npm install -g asar`                  |
-| `build-essential`| Required for compiling native modules            | `sudo apt install build-essential`          |
-| `python3`        | Required by some Node.js modules during build    | `sudo apt install python3`                  |
-| `git`            | Used to clone the repository (optional)          | `sudo apt install git`                      `
+| Tool             | Purpose                                         | Ubuntu/Debian Install Command                         |
+|------------------|--------------------------------------------------|--------------------------------------------------------|
+| `curl`           | Download files over HTTP(S)                      | `sudo apt install curl`                               |
+| `7z`             | Extract `.exe` and `.7z` archives (`p7zip-full`) | `sudo apt install p7zip-full`                         |
+| `node`           | JavaScript runtime                               | `sudo apt install nodejs`                             |
+| `npm`            | Node.js package manager                          | `sudo apt install npm`                                |
+| `asar`           | Extract and repack `.asar` Electron archives     | `sudo npm install -g asar`                            |
+| `build-essential`| Required for compiling native modules            | `sudo apt install build-essential`                    |
+| `python3.11`     | Compatible Python version with venv support      | `sudo apt install python3.11 python3.11-venv`         |
+| `git`            | Used to clone the repository (optional)          | `sudo apt install git`                                |
 
-You can install most of them in one step:
+Install them all in one step:
 
 ```bash
 sudo apt update
-sudo apt install curl p7zip-full nodejs npm build-essential python3 git
+sudo apt install curl p7zip-full nodejs npm build-essential python3.11 python3.11-venv git
 sudo npm install -g asar
 ```
 
-Run this one-liner:
+---
+
+### 🛠️ Build Process
+
+The setup script now:
+
+- Creates a virtualenv with Python 3.11+ to ensure a compatible `distutils` environment
+- Installs `setuptools` and a shim for `distutils` to work with modern Python
+- Rebuilds native modules like `node-hid` using the patched environment
+- Applies community patches into `./input-app/`
+- Launches the app with Electron
+
+Run it:
 
 ```bash
-git clone https://github.com/worklouder/input-linux.git && cd input-linux && bash input4linux-0.8.0-rc7.sh
+git clone https://github.com/worklouder/input-linux.git
+cd input-linux
+bash input4linux-0.8.0.sh
 ```
 
-This will:
-- Download and extract the Windows `.exe` release
-- Rebuild native modules for Linux
-- Apply community patches
-- Set up a working directory (`input-app/`) to launch from
-
-Launch it with:
+Launch the app:
 
 ```bash
 ./input-app/start.sh
@@ -104,13 +110,16 @@ Afterward, **unplug and replug your keyboard** before launching the app.
 
 ## Troubleshooting
 
-- If you encounter permission issues with `npm`, consider using [`nvm`](https://github.com/nvm-sh/nvm) to manage Node.js in your user space.
-- If `node-hid` fails to build, ensure you have `build-essential` and `python3` installed.
+- If `node-hid` fails to build and you’re using Python 3.12 or newer, ensure the build script properly activates its virtualenv.
+- Use Python 3.11+ for best compatibility with `node-gyp`.
+- If the app launches but doesn’t detect your device, ensure udev rules are installed (see above).
 - The build script defaults to `TEST_MODE=true`, which skips over non-critical errors. You can run it in strict mode like this:
 
 ```bash
-TEST_MODE=false ./input4linux-0.8.0-rc2.sh
+TEST_MODE=false ./input4linux-0.8.0-rc7.sh
 ```
+
+- If you were previously using `npm config set python`, that’s no longer needed. The build script uses `export PYTHON=...` automatically now.
 
 ---
 
