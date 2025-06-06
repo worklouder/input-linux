@@ -8,6 +8,60 @@ MATCH_NAME="Work Louder"
 echo "Generating udev rules for \"$MATCH_NAME\" devices..."
 echo "# udev rules for Work Louder and Nomad devices (USB and Bluetooth)" | sudo tee "$TEMP_FILE" > /dev/null
 
+# ----- Dynamic rules for USB Work Louder devices -----
+mapfile -t DEVICES < <(lsusb | grep "$MATCH_NAME")
+
+if [[ ${#DEVICES[@]} -eq 0 ]]; then
+    echo "No USB devices found with manufacturer \"$MATCH_NAME\""
+else
+    echo "Found matching USB devices:"
+    printf '%s\n' "${DEVICES[@]}"
+
+    for DEVICE in "${DEVICES[@]}"; do
+        ID_VENDOR=$(echo "$DEVICE" | awk '{print $6}' | cut -d: -f1)
+        ID_PRODUCT=$(echo "$DEVICE" | awk '{print $6}' | cut -d: -f2)
+
+        echo "Adding rules for USB $ID_VENDOR:$ID_PRODUCT"
+
+        echo "SUBSYSTEM==\"usb\", ATTR{idVendor}==\"$ID_VENDOR\", ATTR{idProduct}==\"$ID_PRODUCT\", MODE=\"0666\", GROUP=\"plugdev\", SYMLINK+=\"worklouder\"" | sudo tee -a "$TEMP_FILE" > /dev/null
+        echo "KERNEL==\"hidraw*\", SUBSYSTEM==\"hidraw\", ATTRS{idVendor}==\"$ID_VENDOR\", ATTRS{idProduct}==\"$ID_PRODUCT\", MODE=\"0666\", GROUP=\"plugdev\", TAG+=\"uaccess\"" | sudo tee -a "$TEMP_FILE" > /dev/null
+        echo "SUBSYSTEM==\"tty\", ATTRS{idVendor}==\"$ID_VENDOR\", ATTR{idProduct}==\"$ID_PRODUCT\", MODE=\"0666\", GROUP=\"plugdev\", TAG+=\"uaccess\"" | sudo tee -a "$TEMP_FILE" > /dev/null
+    done
+fi
+
+# ----- Static rules for Bluetooth-based Work Louder devices -----
+
+# HID over GATT (Bluetooth HID interface)
+echo 'KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{idVendor}=="303a", ATTRS{idProduct}=="8294", MODE="0666", GROUP="plugdev", TAG+="uaccess"' | sudo tee -a "$TEMP_FILE" > /dev/null
+
+# Catch-all for any 303a vendor (USB or Bluetooth)
+echo 'SUBSYSTEM=="hidraw", ATTRS{idVendor}=="303a", MODE="0666", GROUP="plugdev", TAG+="uaccess"' | sudo tee -a "$TEMP_FILE" > /dev/null
+echo 'SUBSYSTEM=="tty", ATTRS{idVendor}=="303a", MODE="0666", GROUP="plugdev", TAG+="uaccess"' | sudo tee -a "$TEMP_FILE" > /dev/null
+
+# Optional: match Work Louder by name (some Bluetooth stacks expose this)
+echo 'ATTRS{name}=="Work Louder*", MODE="0666", GROUP="plugdev", TAG+="uaccess"' | sudo tee -a "$TEMP_FILE" > /dev/null
+
+# ----- Apply Rules -----
+echo "Writing rules to $RULE_FILE"
+sudo mv "$TEMP_FILE" "$RULE_FILE"
+sudo chmod 644 "$RULE_FILE"
+
+echo "Reloading udev rules..."
+sudo udevadm control --reload
+sudo udevadm trigger
+sudo udevadm settle
+
+echo "Done. Please replug your device or restart the app if needed."
+#!/bin/bash
+set -euo pipefail
+
+RULE_FILE="/etc/udev/rules.d/99-worklouder.rules"
+TEMP_FILE="$(mktemp)"
+MATCH_NAME="Work Louder"
+
+echo "Generating udev rules for \"$MATCH_NAME\" devices..."
+echo "# udev rules for Work Louder and Nomad devices (USB and Bluetooth)" | sudo tee "$TEMP_FILE" > /dev/null
+
 # Dynamic rules for USB Work Louder devices
 mapfile -t DEVICES < <(lsusb | grep "$MATCH_NAME")
 
