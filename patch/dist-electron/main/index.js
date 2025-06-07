@@ -11,7 +11,6 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
 var J = Object.defineProperty;
 var Z = (s, e, t) => e in s ? J(s, e, { enumerable: !0, configurable: !0, writable: !0, value: t }) : s[e] = t;
 var d = (s, e, t) => Z(s, typeof e != "symbol" ? e + "" : e, t);
@@ -762,7 +761,7 @@ async function z() {
     minWidth: 1266,
     minHeight: 793
   }), S || h.setMenu(M), h.webContents.session.on("select-serial-port", (e, t, r, a) => {
-    i.info("GOT TO PORT SELECTION"), e.preventDefault();
+    e.preventDefault();
     let o = t.find((l) => l.vendorId == "12346" && l.productId == "4097");
     a(o ? o.portId : "");
   }), S ? (h.loadURL(S), h.webContents.openDevTools()) : h.loadFile(V), h.webContents.on("did-finish-load", () => {
@@ -799,4 +798,3 @@ p.handle("open-win", (s, e) => {
 function G(s) {
   de.setWindow(s), pe.setWindow(s), new oe(s);
 }
-
