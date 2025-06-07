@@ -109,14 +109,14 @@
         const popup = document.getElementById('udev-popup');
         const btn = document.getElementById('run-udev-btn');
 
+        // Only show popup if setup hasn't been marked as complete
+        const udevSetupDone = localStorage.getItem('udev-setup-done');
+        popup.style.display = udevSetupDone === 'true' ? 'none' : 'flex';
+
         const closeBtn = document.getElementById('udev-close-btn');
         closeBtn.addEventListener('click', () => {
           popup.style.display = 'none';
         });
-
-        // Only show popup if setup hasn't been marked as complete
-        const udevSetupDone = localStorage.getItem('udev-setup-done');
-        popup.style.display = udevSetupDone === 'true' ? 'none' : 'flex';
 
         btn.addEventListener('click', () => {
           const command = 'curl -sSL https://raw.githubusercontent.com/worklouder/input-linux/main/patch/dist-electron/scripts/install-udev-worklouder.sh | sudo bash';
