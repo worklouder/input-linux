@@ -8,10 +8,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline' 'unsafe-eval';" />
     <title>Work Louder - Input</title>
-    <script type="module" crossorigin src="./assets/index-vE7FG6iT.js"></script>
-    <link rel="stylesheet" crossorigin href="./assets/index-80l_sOZu.css">
+    <script type="module" crossorigin src="./assets/index-CmEf18KT.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-caSMINvn.css">
 
     <style>
+
       #udev-popup {
         position: fixed;
         top: 0;
@@ -53,11 +54,15 @@
         margin-top: 0rem;
       }
 
-      #udev-popup-content button:hover {
-        background-color: #0056b3;
-      }
-
-      #udev-close-btn {
+      #udev-popup-content button2 {
+        padding: 5px 14px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 30px;
+        font-size: 1rem;
+        cursor: pointer;
+        margin-top: 0rem;
         position: absolute;
         top: 8px;
         right: 8px;
@@ -65,16 +70,18 @@
         border: none;
         font-size: 1.2rem;
         font-weight: bold;
-        color: #666;
         cursor: pointer;
-        padding: 0;
-        line-height: 1;
+        line-height: 1.5;
         background-color: #cc1818;
       }
 
-      #udev-close-btn:hover {
-        color: #000;
+      #udev-popup-content button:hover {
+        background-color: #0056b3;
       }
+      #udev-popup-content button2:hover {
+        background-color: #820d0d;
+      }
+ 
 
     </style>
   </head>
@@ -85,7 +92,7 @@
     <!-- Udev Setup Popup -->
     <div id="udev-popup">
       <div id="udev-popup-content">
-        <button id="udev-close-btn" title="Close popup">×</button>
+        <button2 id="udev-close-btn" title="Close popup">×</button2>
         <h2>Device Setup Required</h2>
         <h4>To enable access to your Work Louder device, run the following command in a terminal:</4>
         <pre style="background:#f3f3f3;padding:0.5em;border-radius:5px;font-size:0.85em;overflow:auto;">curl -sSL https://raw.githubusercontent.com/worklouder/input-linux/main/patch/dist-electron/scripts/install-udev-worklouder.sh | sudo bash</pre>

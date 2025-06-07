@@ -1,6 +1,6 @@
 {
   "name": "input",
-  "version": "0.8.0-Devbuild",
+  "version": "0.8.1-Community",
   "description": "Input App - Work Louder",
   "author": "Work Louder",
   "license": "none",
@@ -40,7 +40,6 @@
     "recoil": "^0.7.7",
     "recoil-persist": "^5.1.0",
     "serialport": "^12.0.0",
-    "sudo-prompt": "^9.2.1",
     "web-serial-polyfill": "^1.0.15"
   },
   "devDependencies": {
