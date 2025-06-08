@@ -2,49 +2,64 @@
 set -euo pipefail
 
 RULE_FILE="/etc/udev/rules.d/99-worklouder.rules"
-TEMP_FILE="$(mktemp)"
-MATCH_NAME="Work Louder"
 
-echo "Generating udev rules for \"$MATCH_NAME\" devices..."
-echo "# udev rules for Work Louder and Nomad devices (USB and Bluetooth)" | sudo tee "$TEMP_FILE" > /dev/null
-
-# Dynamic rules for USB Work Louder devices
-mapfile -t DEVICES < <(lsusb | grep "$MATCH_NAME")
-
-if [[ ${#DEVICES[@]} -eq 0 ]]; then
-    echo "No USB devices found with manufacturer \"$MATCH_NAME\""
-else
-    echo "Found matching USB devices:"
-    printf '%s\n' "${DEVICES[@]}"
-
-    for DEVICE in "${DEVICES[@]}"; do
-        ID_VENDOR=$(echo "$DEVICE" | awk '{print $6}' | cut -d: -f1)
-        ID_PRODUCT=$(echo "$DEVICE" | awk '{print $6}' | cut -d: -f2)
-
-        echo "Adding rules for $ID_VENDOR:$ID_PRODUCT"
-
-        echo "SUBSYSTEM==\"usb\", ATTR{idVendor}==\"$ID_VENDOR\", ATTR{idProduct}==\"$ID_PRODUCT\", MODE=\"0666\", GROUP=\"plugdev\", SYMLINK+=\"worklouder\"" | sudo tee -a "$TEMP_FILE" > /dev/null
-        echo "KERNEL==\"hidraw*\", SUBSYSTEM==\"hidraw\", ATTRS{idVendor}==\"$ID_VENDOR\", ATTRS{idProduct}==\"$ID_PRODUCT\", MODE=\"0666\", GROUP=\"plugdev\", TAG+=\"uaccess\"" | sudo tee -a "$TEMP_FILE" > /dev/null
-        echo "SUBSYSTEM==\"tty\", ATTRS{idVendor}==\"$ID_VENDOR\", ATTR{idProduct}==\"$ID_PRODUCT\", MODE=\"0666\", GROUP=\"plugdev\", TAG+=\"uaccess\"" | sudo tee -a "$TEMP_FILE" > /dev/null
-    done
+# Handle uninstall mode
+if [[ "${1:-}" == "uninstall" ]]; then
+  echo "Uninstalling Work Louder udev rules..."
+  if [[ -f "$RULE_FILE" ]]; then
+    sudo rm "$RULE_FILE"
+    echo "Removed $RULE_FILE"
+    echo "Reloading udev rules..."
+    sudo udevadm control --reload
+    sudo udevadm trigger
+    sudo udevadm settle
+    echo "Done. Please replug your device or restart the app if needed."
+  else
+    echo "No udev rules to remove at $RULE_FILE"
+  fi
+  exit 0
 fi
 
-# --- Static rules for Bluetooth-based Nomad ---
+# Detect appropriate group for udev device access
+if grep -qi 'ID_LIKE=.*fedora' /etc/os-release || grep -qi 'fedora' /etc/os-release; then
+  UDEV_GROUP="input"
+elif grep -qi 'ID_LIKE=.*arch' /etc/os-release || grep -qi 'arch' /etc/os-release; then
+  UDEV_GROUP="input"
+elif grep -qi 'ID_LIKE=.*debian' /etc/os-release || grep -qi 'ubuntu' /etc/os-release; then
+  UDEV_GROUP="plugdev"
+else
+  UDEV_GROUP="plugdev"  # Fallback
+fi
 
-# Nomad over Bluetooth HID (Work Louder via BT)
-echo 'KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{idVendor}=="303a", ATTRS{idProduct}=="8294", MODE="0666", GROUP="plugdev", TAG+="uaccess"' | sudo tee -a "$TEMP_FILE" > /dev/null
+TEMP_FILE="$(mktemp)"
+echo "Using GROUP=\"$UDEV_GROUP\" for udev permissions"
+echo "Writing static Work Louder udev rules to \"$RULE_FILE\"..."
 
-# Optionally cover future BT devices from Work Louder by vendor ID alone
-echo 'ATTRS{idVendor}=="303a", MODE="0666", GROUP="plugdev", TAG+="uaccess"' | sudo tee -a "$TEMP_FILE" > /dev/null
+# Create static rules
+sudo tee "$TEMP_FILE" > /dev/null <<EOF
+# udev rules for Work Louder and Nomad devices (USB and Bluetooth)
 
-# Optional: ESP32-S3 serial (used in some dev setups)
-echo 'SUBSYSTEM=="tty", ATTRS{idVendor}=="303a", ATTRS{idProduct}=="1001", MODE="0666", GROUP="plugdev", TAG+="uaccess"' | sudo tee -a "$TEMP_FILE" > /dev/null
+# USB HID devices (Work Louder / Nomad keyboards)
+KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{idVendor}=="303a", ATTRS{idProduct}=="8294", MODE="0666", GROUP="$UDEV_GROUP", TAG+="uaccess"
 
-# Apply the new rules
-echo "Writing rules to $RULE_FILE"
+# USB serial (e.g. ESP32-S3 bootloader or debug)
+SUBSYSTEM=="tty", ATTRS{idVendor}=="303a", ATTRS{idProduct}=="1001", MODE="0666", GROUP="$UDEV_GROUP", TAG+="uaccess"
+
+# Generic match for any future Work Louder USB device
+SUBSYSTEM=="usb", ATTR{idVendor}=="303a", MODE="0666", GROUP="$UDEV_GROUP"
+
+# Generic match for any hidraw device by vendor (Bluetooth HID or USB)
+SUBSYSTEM=="hidraw", ATTRS{idVendor}=="303a", MODE="0666", GROUP="$UDEV_GROUP", TAG+="uaccess"
+
+# Optional: match device name (not all systems expose this)
+ATTRS{name}=="Work Louder*", MODE="0666", GROUP="$UDEV_GROUP", TAG+="uaccess"
+EOF
+
+# Install rules
 sudo mv "$TEMP_FILE" "$RULE_FILE"
 sudo chmod 644 "$RULE_FILE"
 
+# Reload and settle
 echo "Reloading udev rules..."
 sudo udevadm control --reload
 sudo udevadm trigger
