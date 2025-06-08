@@ -72,9 +72,6 @@
         "filter": ["AppRun"]
       }
     ],
-    "asarUnpack": [
-      "dist-electron/scripts/install-udev-worklouder.sh"
-    ],
     "linux": {
       "target": "AppImage",
       "category": "Utility",
