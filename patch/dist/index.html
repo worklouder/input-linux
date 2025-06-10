@@ -1,7 +1,5 @@
 <!DOCTYPE html>
-<html lang="en"
-  style="overflow: hidden;"
->
+<html lang="en" style="overflow: hidden;">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/x-icon" href="./favicon.ico" />
@@ -12,18 +10,21 @@
     <link rel="stylesheet" crossorigin href="./assets/index-caSMINvn.css">
 
     <style>
-
       #udev-popup {
+        display: none; /* Hidden by default to avoid flash */
         position: fixed;
         top: 0;
         left: 0;
         width: 100vw;
         height: 100vh;
         background: rgba(0, 0, 0, 0.7);
-        display: flex;
         align-items: center;
         justify-content: center;
         z-index: 9999;
+      }
+
+      #udev-popup.show {
+        display: flex;
       }
 
       #udev-popup-content {
@@ -78,11 +79,10 @@
       #udev-popup-content button:hover {
         background-color: #0056b3;
       }
+
       #udev-popup-content button2:hover {
         background-color: #820d0d;
       }
- 
-
     </style>
   </head>
 
@@ -94,13 +94,13 @@
       <div id="udev-popup-content">
         <button2 id="udev-close-btn" title="Close popup">×</button2>
         <h2>Device Setup Required</h2>
-        <h4>To enable access to your Work Louder device, run the following command in a terminal:</4>
-        <pre style="background:#f3f3f3;padding:0.5em;border-radius:5px;font-size:0.85em;overflow:auto;">curl -sSL https://raw.githubusercontent.com/worklouder/input-linux/main/patch/dist-electron/scripts/install-udev-worklouder.sh | sudo bash</pre>
+        <h4>To enable access to your Work Louder device, run the following command in a terminal:</h4>
+        <pre style="background:#f3f3f3;padding:0.5em;border-radius:5px;font-size:0.85em;overflow:auto;">
+curl -sSL https://raw.githubusercontent.com/worklouder/input-linux/main/patch/dist-electron/scripts/install-udev-worklouder.sh | sudo bash</pre>
         <div style="display: flex; justify-content: center; gap: 1rem; margin-top: 1rem;">
           <button id="run-udev-btn">Copy</button>
           <button id="hide-udev-btn">Don't show again</button>
         </div>
-
       </div>
     </div>
 
@@ -108,14 +108,15 @@
       window.addEventListener('DOMContentLoaded', () => {
         const popup = document.getElementById('udev-popup');
         const btn = document.getElementById('run-udev-btn');
-
-        // Only show popup if setup hasn't been marked as complete
         const udevSetupDone = localStorage.getItem('udev-setup-done');
-        popup.style.display = udevSetupDone === 'true' ? 'none' : 'flex';
+
+        if (udevSetupDone !== 'true') {
+          popup.classList.add('show');
+        }
 
         const closeBtn = document.getElementById('udev-close-btn');
         closeBtn.addEventListener('click', () => {
-          popup.style.display = 'none';
+          popup.classList.remove('show');
         });
 
         btn.addEventListener('click', () => {
@@ -125,17 +126,16 @@
           }).catch(() => {
             alert('Copy failed. Please copy manually:\n\n' + command);
           });
-          popup.style.display = 'none';
+          popup.classList.remove('show');
           localStorage.setItem('udev-setup-done', 'true');
         });
 
         const hideBtn = document.getElementById('hide-udev-btn');
         hideBtn.addEventListener('click', () => {
           localStorage.setItem('udev-setup-done', 'true');
-          popup.style.display = 'none';
+          popup.classList.remove('show');
         });
 
-        // Observe the DOM for dynamically rendered items
         const observer = new MutationObserver(() => {
           const syncBanner = document.querySelector('[class*="sync_countdown_container"]');
           const releaseButton = document.querySelector('._release__button_1jm4y_1');
@@ -146,7 +146,7 @@
             connectionText.title = 'Click to reinstall udev permissions';
             connectionText.addEventListener('click', () => {
               localStorage.removeItem('udev-setup-done');
-              popup.style.display = 'flex';
+              popup.classList.add('show');
             });
             connectionText.dataset.listenerAttached = "true";
           }
@@ -161,7 +161,6 @@
             releaseButton.dataset.listenerAttached = "true";
           }
 
-          // Inject menu item once the menu exists
           const inputMenu = document.querySelector('#input-dropdown-menu');
           if (inputMenu && !document.getElementById('udev-menu-item')) {
             const udevItem = document.createElement('li');
@@ -170,13 +169,13 @@
             udevItem.style.cursor = 'pointer';
             udevItem.addEventListener('click', () => {
               localStorage.removeItem('udev-setup-done');
-              popup.style.display = 'flex';
+              popup.classList.add('show');
             });
             inputMenu.appendChild(udevItem);
           }
 
           if (syncBanner && connectionText && releaseButton) {
-            observer.disconnect(); // Stop once all are handled
+            observer.disconnect();
           }
         });
 
@@ -185,9 +184,6 @@
           subtree: true,
         });
       });
-
     </script>
-    
   </body>
 </html>
-
