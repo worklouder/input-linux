@@ -39,21 +39,25 @@ echo "Writing static Work Louder udev rules to \"$RULE_FILE\"..."
 sudo tee "$TEMP_FILE" > /dev/null <<EOF
 # udev rules for Work Louder and Nomad devices (USB and Bluetooth)
 
-# USB HID devices (Work Louder / Nomad keyboards)
+# USB HID devices (Nomad/Work Louder)
 KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{idVendor}=="303a", ATTRS{idProduct}=="8294", MODE="0666", GROUP="$UDEV_GROUP", TAG+="uaccess"
 
-# USB serial (e.g. ESP32-S3 bootloader or debug)
+# Serial for ESP32-S3 or similar
 SUBSYSTEM=="tty", ATTRS{idVendor}=="303a", ATTRS{idProduct}=="1001", MODE="0666", GROUP="$UDEV_GROUP", TAG+="uaccess"
 
-# Generic match for any future Work Louder USB device
+# Legacy Nomad firmware (serial-based)
+SUBSYSTEM=="tty", ATTRS{idVendor}=="574c", ATTRS{idProduct}=="6e63", MODE="0666", GROUP="$UDEV_GROUP", TAG+="uaccess"
+
+# Generic match for future Work Louder USB devices
 SUBSYSTEM=="usb", ATTR{idVendor}=="303a", MODE="0666", GROUP="$UDEV_GROUP"
 
 # Generic match for any hidraw device by vendor (Bluetooth HID or USB)
 SUBSYSTEM=="hidraw", ATTRS{idVendor}=="303a", MODE="0666", GROUP="$UDEV_GROUP", TAG+="uaccess"
 
-# Optional: match device name (not all systems expose this)
+# Optional: match device name (not always reliable)
 ATTRS{name}=="Work Louder*", MODE="0666", GROUP="$UDEV_GROUP", TAG+="uaccess"
 EOF
+
 
 # Install rules
 sudo mv "$TEMP_FILE" "$RULE_FILE"
