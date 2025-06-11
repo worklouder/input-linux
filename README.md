@@ -1,6 +1,6 @@
 # Input - Linux Version
 
-## ⚠️ Disclaimer
+##  Disclaimer
 
 This project is an **unofficial community-developed** port of the Input application, intended for use on Linux systems.
 
@@ -21,7 +21,7 @@ By using, copying, modifying, or distributing this software, **you agree to thes
 
 You have two options for using Input on Linux:
 
-### Option 1: Download Prebuilt AppImage
+### Option 1: Prebuilt AppImage
 
 The easiest way to get started is by visiting the [Releases Page](https://github.com/worklouder/input-linux/releases) and downloading the latest `.AppImage`.
 
@@ -39,16 +39,23 @@ chmod +x Input-*.AppImage
 
 ---
 
-### Option 2: Build It Yourself
+### Option 2: Build from Source
 
 This option is for users who want to rebuild the application from the official Windows installer.
 
-### Requirements
 
-Before running the setup script, ensure the following tools are installed and accessible in your `$PATH`:
+### Dependencies
 
-| Tool             | Purpose                                         | Ubuntu/Debian Install Command                         |
-|------------------|--------------------------------------------------|--------------------------------------------------------|
+Install all required tools in one go:
+
+```bash
+sudo apt update
+sudo apt install curl p7zip-full nodejs npm build-essential python3.11 python3.11-venv git
+sudo npm install -g asar
+```
+
+These packages are needed to unpack, patch, and run the Input application. You can also install them manually if you prefer.
+------------------|--------------------------------------------------|--------------------------------------------------------|
 | `curl`           | Download files over HTTP(S)                      | `sudo apt install curl`                               |
 | `7z`             | Extract `.exe` and `.7z` archives (`p7zip-full`) | `sudo apt install p7zip-full`                         |
 | `node`           | JavaScript runtime                               | `sudo apt install nodejs`                             |
@@ -68,7 +75,7 @@ sudo npm install -g asar
 
 ---
 
-### 🛠️ Build Process
+###  Build Process
 
 The setup script now:
 
@@ -110,16 +117,16 @@ Afterward, **unplug and replug your keyboard** before launching the app.
 
 ## Troubleshooting
 
-- If `node-hid` fails to build and you’re using Python 3.12 or newer, ensure the build script properly activates its virtualenv.
+- If `node-hid` fails to build and youre using Python 3.12 or newer, ensure the build script properly activates its virtualenv.
 - Use Python 3.11+ for best compatibility with `node-gyp`.
-- If the app launches but doesn’t detect your device, ensure udev rules are installed (see above).
+- If the app launches but doesnt detect your device, ensure udev rules are installed (see above).
 - The build script defaults to `TEST_MODE=true`, which skips over non-critical errors. You can run it in strict mode like this:
 
 ```bash
 TEST_MODE=false ./input4linux-0.8.1.sh
 ```
 
-- If you were previously using `npm config set python`, that’s no longer needed. The build script uses `export PYTHON=...` automatically now.
+- If you were previously using `npm config set python`, thats no longer needed. The build script uses `export PYTHON=...` automatically now.
 
 ---
 
