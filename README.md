@@ -1,4 +1,4 @@
-# Input - Linux Version
+# Input - Linux
 
 ##  Disclaimer
 
