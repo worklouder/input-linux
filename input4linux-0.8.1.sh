@@ -1,8 +1,13 @@
 #!/bin/bash
 set -euo pipefail
 
+# This script sets up the Input Linux app from source.
+# If you're just testing or debugging, you can run this with:
+#   TEST_MODE=true ./input4linux-0.8.1.sh
+# Set TEST_MODE=false to enforce strict failure on errors.
+
 # Configuration
-TEST_MODE="${TEST_MODE:-true}"
+TEST_MODE="${TEST_MODE:-false}"
 URL="https://github.com/worklouder/input-releases/releases/download/v0.8.1/input-Setup-0.8.1.exe"
 FILENAME="input-Setup-0.8.1.exe"
 DOWNLOAD_DIR="./input_download"
@@ -14,12 +19,16 @@ PATCH_DIR="./patch"
 ELECTRON_VERSION="29.2.0"
 
 # Python virtualenv setup
-PY_VER="3"
+PY_VER="3.11"
 VENV_DIR="$HOME/.node-build-env"
 PYTHON="$VENV_DIR/bin/python"
 
-echo "🔧 Setting up Python $PY_VER virtual environment for node-gyp compatibility..."
+echo " Setting up Python $PY_VER virtual environment for node-gyp compatibility..."
 if [[ ! -d "$VENV_DIR" ]]; then
+    if ! command -v python$PY_VER &>/dev/null; then
+        echo " Error: python$PY_VER not found. Please install Python $PY_VER."
+        exit 1
+    fi
     python$PY_VER -m venv "$VENV_DIR"
 fi
 source "$VENV_DIR/bin/activate"
@@ -42,8 +51,8 @@ export PYTHON="$PYTHON"
 # Required tools check
 for cmd in curl 7z asar npm; do
     if ! command -v "$cmd" &>/dev/null; then
-        echo "❌ Missing required command: $cmd"
-        [[ "$TEST_MODE" == true ]] && echo "⚠️ Test mode enabled, continuing..." || exit 1
+        echo " Missing required command: $cmd"
+        [[ "$TEST_MODE" == true ]] && echo " Test mode enabled, continuing..." || exit 1
     fi
 done
 
@@ -62,13 +71,13 @@ handle_error() {
 mkdir -p "$DOWNLOAD_DIR" "$EXTRACT_DIR" "$REBUILD_DIR" "$APP_64_EXTRACT_DIR"
 
 # Download installer
-echo "⬇️ Downloading $FILENAME..."
+echo " Downloading $FILENAME..."
 if ! curl -L "$URL" -o "$DOWNLOAD_DIR/$FILENAME"; then
     handle_error "Download failed"
 fi
 
 # Extract installer
-echo "📦 Extracting $FILENAME..."
+echo " Extracting $FILENAME..."
 if ! 7z x "$DOWNLOAD_DIR/$FILENAME" -o"$EXTRACT_DIR"; then
     handle_error "Failed to extract EXE"
 fi
@@ -82,7 +91,7 @@ else
 fi
 
 # Extract app-64.7z
-echo "📦 Extracting app-64.7z..."
+echo " Extracting app-64.7z..."
 if ! 7z x "$REBUILD_DIR/app-64.7z" -o"$APP_64_EXTRACT_DIR"; then
     handle_error "Failed to extract app-64.7z"
 fi
@@ -96,14 +105,14 @@ if [[ ! -f "$ASAR_FILE" ]]; then
     handle_error "app.asar not found"
 fi
 
-echo "📂 Unpacking app.asar..."
+echo " Unpacking app.asar..."
 mkdir -p "$UNPACKED_DIR"
 if ! asar extract "$ASAR_FILE" "$UNPACKED_DIR"; then
     handle_error "Failed to unpack app.asar"
 fi
 
 # Setup Electron project
-echo "⚙️ Setting up Node environment..."
+echo " Setting up Node environment..."
 (
     cd "$UNPACKED_DIR" || handle_error "Cannot cd into unpacked directory"
 
@@ -120,7 +129,7 @@ echo "⚙️ Setting up Node environment..."
 
 # Move app to final location
 if [[ -d "$FINAL_APP_DIR" ]]; then
-    echo "🧹 Removing old $FINAL_APP_DIR"
+    echo " Removing old $FINAL_APP_DIR"
     rm -rf "$FINAL_APP_DIR"
 fi
 
@@ -128,19 +137,18 @@ mv "$UNPACKED_DIR" "$FINAL_APP_DIR"
 
 # Apply patch files
 if [[ -d "$PATCH_DIR" ]]; then
-    echo "🩹 Applying patch files from $PATCH_DIR to $FINAL_APP_DIR"
+    echo " Applying patch files from $PATCH_DIR to $FINAL_APP_DIR"
     cp -a "$PATCH_DIR/." "$FINAL_APP_DIR/"
     if [[ -f "$FINAL_APP_DIR/AppRun" ]]; then
         chmod +x "$FINAL_APP_DIR/AppRun"
     fi
 else
-    echo "ℹ️ No patch directory found at $PATCH_DIR, skipping patch step"
+    echo " No patch directory found at $PATCH_DIR, skipping patch step"
 fi
 
 # Cleanup
-echo "🧽 Cleaning up temporary files..."
+echo " Cleaning up temporary files..."
 rm -rf "$DOWNLOAD_DIR" "$EXTRACT_DIR" "$REBUILD_DIR"
 
-echo "✅ Done. Launch the app using:"
+echo " Done. Launch the app using:"
 echo "./input-app/start.sh"
-
