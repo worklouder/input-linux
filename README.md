@@ -83,7 +83,7 @@ Run it:
 ```bash
 git clone https://github.com/worklouder/input-linux.git
 cd input-linux
-bash input4linux-0.8.1.sh
+bash input4linux-0.8.2.sh
 ```
 
 Launch the app:
@@ -116,7 +116,7 @@ Afterward, **unplug and replug your keyboard** before launching the app.
 - The build script defaults to `TEST_MODE=true`, which skips over non-critical errors. You can run it in strict mode like this:
 
 ```bash
-TEST_MODE=false ./input4linux-0.8.1.sh
+TEST_MODE=false ./input4linux-0.8.2.sh
 ```
 
 - If you were previously using `npm config set python`, that’s no longer needed. The build script uses `export PYTHON=...` automatically now.

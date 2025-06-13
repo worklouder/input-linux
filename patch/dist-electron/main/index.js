@@ -24,7 +24,7 @@ import { devices as _, HIDAsync as H } from "node-hid";
 import { SerialPort as B, DelimiterParser as ee } from "serialport";
 import { download as ne, CancelError as te } from "electron-dl";
 import * as g from "fs";
-import { join as y } from "path";
+import { join as D } from "path";
 import { exec as re } from "child_process";
 var L = /* @__PURE__ */ ((s) => (s.checkUpdates = "check-updates", s.installUpdate = "install-update", s.onUpdateDonwloaded = "on-update-downloaded", s))(L || {});
 function se() {
@@ -212,17 +212,17 @@ const q = [
 ];
 var m = /* @__PURE__ */ ((s) => (s[s.serial = 0] = "serial", s[s.hid = 1] = "hid", s))(m || {});
 class W {
-  constructor(e, t, r, a, o, l) {
+  constructor(e, t, r, a, o, c) {
     d(this, "portPath");
     d(this, "devicePid");
     d(this, "connectionType");
     d(this, "deviceType");
     d(this, "layoutType");
     d(this, "isUsbConnection");
-    this.portPath = e, this.devicePid = t, this.connectionType = r, this.deviceType = a, this.layoutType = o, this.isUsbConnection = l;
+    this.portPath = e, this.devicePid = t, this.connectionType = r, this.deviceType = a, this.layoutType = o, this.isUsbConnection = c;
   }
 }
-var I = /* @__PURE__ */ ((s) => (s.NomadE = "nomad_e", s.Knob = "knob", s))(I || {}), D = /* @__PURE__ */ ((s) => (s.unknown = "unknown", s.ansi = "ansi", s.iso = "iso", s))(D || {}), A = /* @__PURE__ */ ((s) => (s.searchDevices = "searchDevices", s.searchForDeviceInBootloader = "searchForDeviceInBootloader", s))(A || {});
+var I = /* @__PURE__ */ ((s) => (s.NomadE = "nomad_e", s.Knob = "knob", s))(I || {}), y = /* @__PURE__ */ ((s) => (s.unknown = "unknown", s.ansi = "ansi", s.iso = "iso", s))(y || {}), A = /* @__PURE__ */ ((s) => (s.searchDevices = "searchDevices", s.searchForDeviceInBootloader = "searchForDeviceInBootloader", s))(A || {});
 const f = class f {
   constructor() {
     d(this, "win", null);
@@ -237,11 +237,11 @@ const f = class f {
       const t = await B.list();
       let r = [];
       return t.forEach((a) => {
-        var c;
+        var l;
         if (parseInt(a.vendorId ?? "", 16) !== f.vid)
           return;
-        const l = f.getDeviceFromSerialPort(a);
-        l !== void 0 && (e && ((c = a.serialNumber) != null && c.endsWith("0000")) || a.manufacturer === "Espressif") && r.push(l);
+        const c = f.getDeviceFromSerialPort(a);
+        c !== void 0 && (e && ((l = a.serialNumber) != null && l.endsWith("0000")) || a.manufacturer === "Espressif") && r.push(c);
       }), r;
     } catch (t) {
       return i.error(t), [];
@@ -250,7 +250,7 @@ const f = class f {
   async searchDevices() {
     let e = await _(), t = e.filter(
       (o) => o.manufacturer !== void 0 && f.manufacturers.some(
-        (l) => o.manufacturer.includes(l)
+        (c) => o.manufacturer.includes(c)
       ) && o.vendorId === f.vid
     );
     if (t.length === 0 && (t = e.filter(
@@ -258,22 +258,22 @@ const f = class f {
     )), t.length === 0)
       return [];
     let r = [];
-    return t.find((o) => o.productId === f.legacyNomadPid) !== void 0 && (t = t.filter((c) => c.productId !== f.legacyNomadPid), (await B.list()).filter((c) => parseInt(c.productId ?? "", 16) === f.legacyNomadPid).forEach((c) => {
-      const u = f.getDeviceFromSerialPort(c);
+    return t.find((o) => o.productId === f.legacyNomadPid) !== void 0 && (t = t.filter((l) => l.productId !== f.legacyNomadPid), (await B.list()).filter((l) => parseInt(l.productId ?? "", 16) === f.legacyNomadPid).forEach((l) => {
+      const u = f.getDeviceFromSerialPort(l);
       u !== void 0 && r.find((N) => u.portPath === N.portPath) === void 0 && r.push(u);
     })), t.forEach((o) => {
-      const l = f.getDeviceFromHIDDevice(o);
-      if (t === void 0 || o.usagePage !== 65280)
+      const c = f.getDeviceFromHIDDevice(o);
+      if (c === void 0 || o.usagePage !== 65280)
         return;
-      const c = r.find((u) => l.devicePid === u.devicePid);
-      if (c !== void 0 && !(l != null && l.isUsbConnection) && (c != null && c.isUsbConnection)) {
-        const u = r.indexOf(c);
+      const l = r.find((u) => c.devicePid === u.devicePid);
+      if (l !== void 0 && !(c != null && c.isUsbConnection) && (l != null && l.isUsbConnection)) {
+        const u = r.indexOf(l);
         if (u === -1)
           return;
-        r[u] = l;
+        r[u] = c;
         return;
       }
-      c === void 0 && r.push(l);
+      l === void 0 && r.push(c);
     }), r;
   }
   static getDeviceFromHIDDevice(e) {
@@ -300,7 +300,7 @@ const f = class f {
     this.win = e;
   }
 };
-d(f, "legacyNomadPid", 4097), d(f, "nomadPids", /* @__PURE__ */ new Map([[4097, D.unknown], [33428, D.ansi], [33429, D.iso]])), d(f, "knobPids", /* @__PURE__ */ new Map([[21845, D.unknown]])), d(f, "vid", 12346), d(f, "manufacturers", ["Work Louder", "Work_Louder"]);
+d(f, "legacyNomadPid", 4097), d(f, "nomadPids", /* @__PURE__ */ new Map([[4097, y.unknown], [33428, y.ansi], [33429, y.iso]])), d(f, "knobPids", /* @__PURE__ */ new Map([[21845, y.unknown]])), d(f, "vid", 12346), d(f, "manufacturers", ["Work Louder", "Work_Louder"]);
 let x = f;
 var w = /* @__PURE__ */ ((s) => (s.isConnected = "isConnected", s.connect = "connect", s.disconnect = "disconnect", s.getConnectedDevice = "getConnectedDevice", s.sendLegacyRpcCall = "sendLegacyRpcCall", s.sendJsonRpcCall = "sendJsonRpcCall", s.onCloseEvent = "onCloseEvent", s.onErrorEvent = "onErrorEvent", s))(w || {});
 const n = class n {
@@ -373,7 +373,13 @@ const n = class n {
   async disconnect() {
     var e, t;
     if (n.instance.connectionType === m.hid) {
-      i.info("Disconnecting hid device"), await ((e = n.instance.connectedDevice) == null ? void 0 : e.close()), n.instance.queue = [], n.instance.connectionType = void 0, n.instance.connectedDevice = null;
+      i.info("Disconnecting hid device");
+      try {
+        await ((e = n.instance.connectedDevice) == null ? void 0 : e.close());
+      } catch {
+        console.error("Failed to disconnect");
+      }
+      n.instance.queue = [], n.instance.connectionType = void 0, n.instance.connectedDevice = null;
       return;
     }
     i.info("Disconnecting serial device"), (t = n.instance.port) == null || t.close(), n.instance.queue = [], n.instance.connectionType = void 0, n.instance.port = null, n.instance.serialDevice = null;
@@ -381,21 +387,21 @@ const n = class n {
   async connectWithSerial(e) {
     if (n.instance.port !== null)
       return i.info("A device is already connected "), Promise.reject("A device is already connected");
-    let t = null, r = new Promise((c, u) => {
-      t = c;
+    let t = null, r = new Promise((l, u) => {
+      t = l;
     }), a = 115200;
     i.info(e.portPath);
     const o = new B({ path: e.portPath, baudRate: a, autoOpen: !1 });
     return o.on("open", () => {
       i.info("Connection opened");
     }), o.on("close", () => {
-      var c;
-      n.instance.queue = [], n.instance.connectionType = void 0, n.instance.port = null, n.instance.serialDevice = null, i.info("Connection closed"), (c = n.instance.win) == null || c.webContents.send(w.onCloseEvent, "CLOSED");
-    }), o.on("error", (c) => {
+      var l;
+      n.instance.queue = [], n.instance.connectionType = void 0, n.instance.port = null, n.instance.serialDevice = null, i.info("Connection closed"), (l = n.instance.win) == null || l.webContents.send(w.onCloseEvent, "CLOSED");
+    }), o.on("error", (l) => {
       var u;
-      i.error(c), n.instance.queue = [], n.instance.connectionType = void 0, n.instance.serialDevice = null, (u = n.instance.win) == null || u.webContents.send(w.onErrorEvent, c.message);
-    }), o.open((c) => {
-      c ? (i.error("errore here"), n.instance.queue = [], n.instance.connectionType = void 0, n.instance.port = null, n.instance.serialDevice = null, i.error(c), t(!1)) : (n.instance.serialDevice = e, t(!0));
+      i.error(l), n.instance.queue = [], n.instance.connectionType = void 0, n.instance.serialDevice = null, (u = n.instance.win) == null || u.webContents.send(w.onErrorEvent, l.message);
+    }), o.open((l) => {
+      l ? (i.error("errore here"), n.instance.queue = [], n.instance.connectionType = void 0, n.instance.port = null, n.instance.serialDevice = null, i.error(l), t(!1)) : (n.instance.serialDevice = e, t(!0));
     }), o.on("data", n.instance.parseSerialRpcData.bind(n.instance)), o.pipe(new ee({ delimiter: `
 ` })).on("data", n.instance.parseSerialData.bind(n.instance)), n.instance.connectionType = m.serial, n.instance.port = o, r;
   }
@@ -422,8 +428,8 @@ const n = class n {
       let o = setTimeout(() => {
         n.instance._responseResolvers[e] && (a("Timeout"), n.instance._responseResolvers[e] = null);
       }, 2e3);
-      n.instance._responseResolvers[e] = (l) => {
-        clearTimeout(o), r(l);
+      n.instance._responseResolvers[e] = (c) => {
+        clearTimeout(o), r(c);
       };
     });
   }
@@ -432,8 +438,8 @@ const n = class n {
       let o = setTimeout(() => {
         n.instance._rpcResolver[t] && (a("Timeout"), n.instance._rpcResolver[t] = null);
       }, 5e3);
-      n.instance._rpcResolver[t] = (l) => {
-        clearTimeout(o), r(l);
+      n.instance._rpcResolver[t] = (c) => {
+        clearTimeout(o), r(c);
       };
     });
   }
@@ -449,26 +455,26 @@ const n = class n {
     const r = Date.now();
     try {
       if (e.length > 61) {
-        const l = Buffer.from(e);
-        let c = 0, u = 1;
-        for (; c < e.length; ) {
-          const F = Math.min(61, e.length - c);
-          console.log(`Sending packet ${u} with ${F} bytes, offset: ${c}`);
+        const c = Buffer.from(e);
+        let l = 0, u = 1;
+        for (; l < e.length; ) {
+          const F = Math.min(61, e.length - l);
+          console.log(`Sending packet ${u} with ${F} bytes, offset: ${l}`);
           const k = Buffer.alloc(64);
-          k[0] = 6, k[1] = n.CHANNEL_RPC, k[2] = F, l.copy(k, 3, c, c + F);
+          k[0] = 6, k[1] = n.CHANNEL_RPC, k[2] = F, c.copy(k, 3, l, l + F);
           const ue = await ((a = n.instance.connectedDevice) == null ? void 0 : a.write(k));
-          c += F, u++, c < e.length;
+          l += F, u++, l < e.length;
         }
         const N = (Date.now() - r) / 1e3;
         return i.info(`Send complete: ${u - 1} packets, ${e.length} bytes in ${N.toFixed(3)} seconds`), !0;
       } else {
-        const l = Buffer.alloc(64);
-        l[0] = 6, l[1] = n.CHANNEL_RPC, l[2] = e.length, Buffer.from(e).copy(l, 3, 0, e.length);
-        const c = await ((o = n.instance.connectedDevice) == null ? void 0 : o.write(l)), u = (Date.now() - r) / 1e3;
-        return i.info(`Sent ${c} bytes in ${u.toFixed(3)} seconds`), !0;
+        const c = Buffer.alloc(64);
+        c[0] = 6, c[1] = n.CHANNEL_RPC, c[2] = e.length, Buffer.from(e).copy(c, 3, 0, e.length);
+        const l = await ((o = n.instance.connectedDevice) == null ? void 0 : o.write(c)), u = (Date.now() - r) / 1e3;
+        return i.info(`Sent ${l} bytes in ${u.toFixed(3)} seconds`), !0;
       }
-    } catch (l) {
-      return i.error(`Error sending message: ${l.message}`), i.error(l.stack), !1;
+    } catch (c) {
+      return i.error(`Error sending message: ${c.message}`), i.error(c.stack), !1;
     }
   }
   parseHIDReport(e) {
@@ -486,19 +492,19 @@ const n = class n {
       const o = (n.instance.buffers[r] + a).split(/\r?\n/);
       if (o.length > 1 || a.endsWith(`
 `) || a.endsWith("\r")) {
-        for (let l = 0; l < o.length - 1; l++) {
-          const c = o[l].trim();
-          if (c) {
+        for (let c = 0; c < o.length - 1; c++) {
+          const l = o[c].trim();
+          if (l) {
             const u = r === n.CHANNEL_DEBUG ? "[LOG]" : "[RPC]";
-            i.info(`${u} ${c}`), r === n.CHANNEL_DEBUG ? i.info(`${u} ${c}`) : r === n.CHANNEL_RPC && (n.instance.parseData(c), n.instance.parseRpcData(c));
+            i.info(`${u} ${l}`), r === n.CHANNEL_DEBUG ? i.info(`${u} ${l}`) : r === n.CHANNEL_RPC && (n.instance.parseData(l), n.instance.parseRpcData(l));
           }
         }
         if (n.instance.buffers[r] = o[o.length - 1], a.endsWith(`
 `) || a.endsWith("\r")) {
-          const l = n.instance.buffers[r].trim();
-          if (l) {
-            const c = r === n.CHANNEL_DEBUG ? "[LOG]" : "[RPC]";
-            i.info(`${c} ${l}`), r === n.CHANNEL_DEBUG ? i.info(`${c} ${l}`) : r === n.CHANNEL_RPC && (n.instance.parseData(l), n.instance.parseRpcData(l));
+          const c = n.instance.buffers[r].trim();
+          if (c) {
+            const l = r === n.CHANNEL_DEBUG ? "[LOG]" : "[RPC]";
+            i.info(`${l} ${c}`), r === n.CHANNEL_DEBUG ? i.info(`${l} ${c}`) : r === n.CHANNEL_RPC && (n.instance.parseData(c), n.instance.parseRpcData(c));
           }
           n.instance.buffers[r] = "";
         }
@@ -575,7 +581,7 @@ const n = class n {
   onErrorEvent(e) {
   }
 };
-d(n, "nomadPids", /* @__PURE__ */ new Map([[4097, D.unknown], [33428, D.ansi], [33429, D.iso]])), d(n, "knobPids", /* @__PURE__ */ new Map([[21845, D.unknown]])), d(n, "CHANNEL_DEBUG", 1), d(n, "CHANNEL_RPC", 2), d(n, "instance");
+d(n, "nomadPids", /* @__PURE__ */ new Map([[4097, y.unknown], [33428, y.ansi], [33429, y.iso]])), d(n, "knobPids", /* @__PURE__ */ new Map([[21845, y.unknown]])), d(n, "CHANNEL_DEBUG", 1), d(n, "CHANNEL_RPC", 2), d(n, "instance");
 let U = n;
 var b = /* @__PURE__ */ ((s) => (s.downloadFile = "downloadFile", s.deleteFile = "deleteFile", s.saveBackupFile = "saveBackupFile", s.getBackupFiles = "getBackupFiles", s.deleteBackupFiles = "deleteBackupFiles", s.getWallpaperImage = "getWallpaperImage", s.saveWallpaperImage = "saveWallpaperImage", s.deleteWallpaperImage = "deleteWallpaperImage", s.readFile = "readFile", s))(b || {});
 class ae {
@@ -613,7 +619,7 @@ class oe {
     }
   }
   async saveBackupFile(e, t) {
-    const r = y(v.getPath("temp"), "backup"), a = y(r, e);
+    const r = D(v.getPath("temp"), "backup"), a = D(r, e);
     try {
       return g.existsSync(r) || g.mkdirSync(r), g.writeFileSync(a, t), !0;
     } catch (o) {
@@ -621,13 +627,13 @@ class oe {
     }
   }
   async getBackupFiles() {
-    const e = y(v.getPath("temp"), "backup");
+    const e = D(v.getPath("temp"), "backup");
     try {
       var t = [];
       if (g.existsSync(e)) {
         const r = g.readdirSync(e);
         i.info(r), t = r.map((a) => {
-          const o = g.readFileSync(y(e, a));
+          const o = g.readFileSync(D(e, a));
           return new ae(a, o);
         });
       }
@@ -637,7 +643,7 @@ class oe {
     }
   }
   async deleteBackupFiles() {
-    const e = y(v.getPath("temp"), "backup");
+    const e = D(v.getPath("temp"), "backup");
     try {
       return g.existsSync(e) && (i.info("Deleting backup files"), g.rmSync(e, { recursive: !0, force: !0 })), !0;
     } catch (t) {
@@ -645,7 +651,7 @@ class oe {
     }
   }
   async getWallpaperImage() {
-    const e = y(v.getPath("userData"), "wallpaper_bg.png");
+    const e = D(v.getPath("userData"), "wallpaper_bg.png");
     try {
       return g.existsSync(e) ? `data:image/png;base64,${g.readFileSync(e).toString("base64")}` : void 0;
     } catch (t) {
@@ -654,7 +660,7 @@ class oe {
     }
   }
   async saveWallpaperImage(e) {
-    const t = y(v.getPath("userData"), "wallpaper_bg.png");
+    const t = D(v.getPath("userData"), "wallpaper_bg.png");
     try {
       return g.writeFileSync(t, e), !0;
     } catch (r) {
@@ -662,7 +668,7 @@ class oe {
     }
   }
   async deleteWallpaperImage() {
-    const e = y(v.getPath("userData"), "wallpaper_bg.png");
+    const e = D(v.getPath("userData"), "wallpaper_bg.png");
     try {
       return g.existsSync(e) && g.unlinkSync(e), !0;
     } catch (t) {
@@ -762,7 +768,7 @@ async function z() {
     minHeight: 793
   }), S || h.setMenu(M), h.webContents.session.on("select-serial-port", (e, t, r, a) => {
     e.preventDefault();
-    let o = t.find((l) => l.vendorId == "12346" && l.productId == "4097");
+    let o = t.find((c) => c.vendorId == "12346" && c.productId == "4097");
     a(o ? o.portId : "");
   }), S ? (h.loadURL(S), h.webContents.openDevTools()) : h.loadFile(V), h.webContents.on("did-finish-load", () => {
     h == null || h.webContents.send("main-process-message", (/* @__PURE__ */ new Date()).toLocaleString());
@@ -781,7 +787,7 @@ v.on("activate", () => {
   const s = T.getAllWindows();
   i.info("activate"), s.length ? s[0].focus() : z().then(G);
 });
-v.on("before-quit", () => {
+v.on("before-quit", (s) => {
   j.disconnect();
 });
 p.handle("open-win", (s, e) => {
